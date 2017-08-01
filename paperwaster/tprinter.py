@@ -219,7 +219,7 @@ class ThermalPrinter(object):
             print "Bitmap under 384 (%s), padding the rest with white" % w
 
         for i, p in enumerate(pixels):
-            black_and_white_pixels[i % w + i / w * 384] = 1 if p == 0 else 0
+            black_and_white_pixels[i % w + i / w * 384] = 0 if p == 0 else 1
 
         return black_and_white_pixels
 
