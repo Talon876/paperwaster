@@ -26,6 +26,15 @@ def text_to_image(msg, font=None, font_path=None, font_size=24, accurate=True):
     # otherwise just count each line as the height of a 'y'
     height = sum([font.getsize(h)[1] for h in msg_lines]) if accurate else glyph_h * len(msg_lines)
 
+    img = Image.new('1', (PRINTER_WIDTH, height), color='white')
+    draw = ImageDraw.Draw(img)
+    y = 0
+    for line in msg_lines:
+        h = font.getsize(line)[1]
+        draw.text([0, y], line, font=font)
+        y += h
+    return img
+
 def code_to_image(image_code, pixel_size=8):
     image_data = ''.join([str(bin(int(s, 16)))[2:].zfill(32) for s in image_code.split('-')])
     num_rows = len(image_data) / (PRINTER_WIDTH / pixel_size)
