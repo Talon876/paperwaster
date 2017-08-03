@@ -10,6 +10,9 @@ setup(name='paperwaster',
     install_requires=required_packages,
     entry_points={
         'console_scripts': [
+            'paperw=paperwaster.cli.paperw:main',
+            'remote-print=paperwaster.cli.remote_print:main',
+            'text2img=paperwaster.cli.text2img:main',
         ]
     },
     include_package_data=True,

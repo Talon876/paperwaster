@@ -1,3 +1,4 @@
 redis
 pyserial
 pillow
+pyyaml
