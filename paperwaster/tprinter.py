@@ -52,15 +52,15 @@ class ThermalPrinter(object):
     # blank page may occur. The more heating interval, the more
     # clear, but the slower printing speed.
 
-    def __init__(self, heatTime=80, heatInterval=2, heatingDots=7, serialport=SERIALPORT):
+    def __init__(self, heat_time=80, heat_interval=2, heating_dots=7, serialport=SERIALPORT):
         self.printer = Serial(serialport, self.BAUDRATE, timeout=self.TIMEOUT)
         self.printer.write(self._ESC) # ESC - command
         self.printer.write(chr(64)) # @   - initialize
         self.printer.write(self._ESC) # ESC - command
         self.printer.write(chr(55)) # 7   - print settings
-        self.printer.write(chr(heatingDots))  # Heating dots (20=balance of darkness vs no jams) default = 20
-        self.printer.write(chr(heatTime)) # heatTime Library default = 255 (max)
-        self.printer.write(chr(heatInterval)) # Heat interval (500 uS = slower, but darker) default = 250
+        self.printer.write(chr(heating_dots))  # Heating dots (20=balance of darkness vs no jams) default = 20
+        self.printer.write(chr(heat_time)) # heat_time Library default = 255 (max)
+        self.printer.write(chr(heat_interval)) # Heat interval (500 uS = slower, but darker) default = 250
 
         # Description of print density from page 23 of the manual:
         # DC2 # n Set printing density

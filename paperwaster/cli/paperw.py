@@ -2,6 +2,7 @@
 import argparse
 import yaml
 from paperwaster import subscribe
+from paperwaster.tprinter import ThermalPrinter
 
 class NullPrinter(object):
     def set_defaults(self): pass
@@ -13,8 +14,9 @@ def main():
     ap.add_argument('--config', '-c', help='path to config file', default='config.yaml')
     args = ap.parse_args()
     config = yaml.safe_load(open(args.config))
+    printer = ThermalPrinter(**config['printer']) if 'printer' in config else NullPrinter()
     try:
-        subscribe(config['redis_uri'])
+        subscribe(config['redis_uri'], printer=printer)
     except KeyboardInterrupt:
         print('Cya!')
 
