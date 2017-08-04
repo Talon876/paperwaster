@@ -1,0 +1,13 @@
+redis
+pillow
+pyyaml
+irc
+
+flask
+flask-sqlalchemy
+sqlalchemy-utils
+flask-redis
+flask-login
+flask-debugtoolbar
+
+gunicorn>=19.7

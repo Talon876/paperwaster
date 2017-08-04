@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+    <body>
+        Let's waste some paper.
+
+        <form method="post" action="{{ url_for('page.send_message') }}">
+            <input name="message" type="text" placeholder="Enter your message" autocomplete="off" autofocus/>
+            <input type="submit" value="Print"/>
+        </form>
+    </body>
+</html>
