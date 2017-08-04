@@ -13,6 +13,7 @@ setup(name='paperwaster',
             'paperw=paperwaster.cli.paperw:main',
             'remote-print=paperwaster.cli.remote_print:main',
             'text2img=paperwaster.cli.text2img:main',
+            'paperirc=paperwaster.ircbot:main',
         ]
     },
     include_package_data=True,
