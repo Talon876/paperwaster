@@ -25,7 +25,7 @@ var init = function(width, height) {
 };
 
 var resize = function(pxHeight) {
-  pxHeight = Math.clamp(pxHeight, 64, 1024);
+  pxHeight = Math.clamp(pxHeight, 64, 768);
   var targetHeight = pxHeight / pixelSize;
   var currentHeight = view.viewSize.height / pixelSize;
   if (currentHeight == targetHeight) return;
