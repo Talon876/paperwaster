@@ -19,7 +19,7 @@ def publish_image_code(ic, r=None, redis_uri=None):
 def publish_message(msg, font, size, r=None, redis_uri=None):
     publish({
         'cmd': 'print',
-        'message': msg,
+        'msg': msg,
         'font': font,
         'size': size
     }, r=r, redis_uri=redis_uri)
