@@ -1,11 +1,11 @@
 import datetime as dt
-from flask import Blueprint, request, render_template, redirect, url_for, g, flash, current_app
+from flask import Blueprint, request, render_template, redirect, url_for, g, flash, current_app, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 
 from paperwaster.web.app import db, red, logger, lm
 from paperwaster.web.auth import OAuthSignIn
 from paperwaster.models import User, Message
-from paperwaster import publish, publish_message, parse_message
+from paperwaster import publish, publish_message, publish_image_code, parse_message
 
 page = Blueprint('page', __name__)
 
@@ -71,8 +71,16 @@ def oauth_callback(provider):
 
 @page.route('/send-message', methods=['POST'])
 def send_message():
-    msg = request.form.get('message')
-    if msg:
-        logger.info('Sending {} to printer'.format(msg.encode('ascii', 'ignore')))
-        publish_message(msg, font='hack', size=28, r=red)
-    return redirect(url_for('page.index'))
+    data = request.get_json()
+    if data and data.get('msg'):
+        logger.info('Sending {} to printer'.format(data['msg'].encode('ascii', 'ignore')))
+        publish_message(data['msg'], font='hack', size=28, r=red)
+    return jsonify({}), 200
+
+@page.route('/send-image', methods=['POST'])
+def send_image():
+    data = request.get_json()
+    if data and data.get('code'):
+        logger.info('Sending image code {} to printer'.format(data['code'].encode('ascii', 'ignore')))
+        publish_image_code(data['code'], r=red)
+    return jsonify({}), 200

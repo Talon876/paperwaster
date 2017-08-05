@@ -223,12 +223,12 @@ class ThermalPrinter(object):
 
         return black_and_white_pixels
 
-    def print_image(self, img):
+    def print_image(self, img, **kw):
         #from PIL import Image
         #i = Image.open("example-lammas.png")
         data = list(img.getdata())
         w, h = img.size
-        self.print_bitmap(data, w, h)
+        self.print_bitmap(data, w, h, **kw)
 
     def print_bitmap(self, pixels, w, h, do_lf=False):
         """ Best to use images that have a pixel width of 384 as this corresponds

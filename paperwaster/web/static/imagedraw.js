@@ -160,6 +160,12 @@ $(document).ready(function() {
       console.log(imageCode);
       $('#print').addClass('disabled');
       toastr.info('Printing image...');
+      $.ajax({
+        type: 'POST',
+        url: '/send-image',
+        data: JSON.stringify({code:imageCode}),
+        contentType: 'application/json'
+      });
       $('#app').fadeOut(900, function() {
         clear();
       }).fadeIn(900, function() {
@@ -187,6 +193,12 @@ $(document).ready(function() {
       console.log('Printing ' + msg);
       toastr.info('Print message...');
       $('#messageField').val('');
+      $.ajax({
+        type: 'POST',
+        url: '/send-message',
+        data: JSON.stringify({msg:msg}),
+        contentType: 'application/json'
+      });
     }
   });
   $('#messageField').keypress(function(e) {
