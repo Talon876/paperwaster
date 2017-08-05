@@ -6,9 +6,9 @@ from paperwaster.tprinter import ThermalPrinter
 
 class NullPrinter(object):
     def set_defaults(self): pass
-    def print_image(self, img):
+    def print_image(self, img, **kw):
         img.save('out.bmp')
-    def linefeed(self):
+    def linefeed(self, **kw):
         pass
 
 def main():
