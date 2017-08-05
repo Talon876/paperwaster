@@ -134,6 +134,19 @@ var clear = function() {
   });
 };
 
+var isImageEmpty = function() {
+  var isEmpty = true;
+  bitmap.forEach(function(row, y) {
+    row.forEach(function(col, x) {
+      var pixel = bitmap[y][x];
+      if (pixel.value !== 0) {
+        isEmpty = false;
+      }
+    });
+  });
+  return isEmpty;
+};
+
 $(document).ready(function() {
   var canvas = document.getElementById('app');
   var width = canvas.width;
@@ -155,21 +168,30 @@ $(document).ready(function() {
   };
 
   document.getElementById('print').onclick = function(e) {
-    if (bitmap) {
+    if (!isImageEmpty()) {
       var imageCode = pack();
       console.log(imageCode);
       $('#print').addClass('disabled');
-      toastr.info('Printing image...');
       $.ajax({
         type: 'POST',
         url: '/send-image',
         data: JSON.stringify({code:imageCode}),
-        contentType: 'application/json'
-      });
-      $('#app').fadeOut(900, function() {
-        clear();
-      }).fadeIn(900, function() {
-        $('#print').removeClass('disabled');
+        contentType: 'application/json',
+        complete: function(xhr, status) {
+          if (xhr.status == 200) {
+            toastr.info('Printing image...');
+            $('#app').fadeOut(900, function() {
+              clear();
+            }).fadeIn(900, function() {
+              $('#print').removeClass('disabled');
+            });
+          } else if (xhr.status == 429) {
+            $('#print').removeClass('disabled');
+            var seconds = xhr.getResponseHeader('Retry-After');
+            var suffix = (seconds <= 1 ? ' 1 second!' : seconds + ' seconds!')
+            toastr.error('Whoa there - try again in ' + suffix);
+          }
+        }
       });
     }
   };
@@ -191,13 +213,21 @@ $(document).ready(function() {
     var msg = $('#messageField').val();
     if (msg) {
       console.log('Printing ' + msg);
-      toastr.info('Print message...');
-      $('#messageField').val('');
       $.ajax({
         type: 'POST',
         url: '/send-message',
         data: JSON.stringify({msg:msg}),
-        contentType: 'application/json'
+        contentType: 'application/json',
+        complete: function(xhr, status) {
+          if (xhr.status == 200) {
+            toastr.info('Print message...');
+            $('#messageField').val('');
+          } else if (xhr.status == 429) {
+            var seconds = xhr.getResponseHeader('Retry-After');
+            var suffix = (seconds <= 1 ? ' 1 second!' : seconds + ' seconds!')
+            toastr.error('Whoa there - try again in ' + suffix);
+          }
+        }
       });
     }
   });

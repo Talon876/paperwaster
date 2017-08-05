@@ -2,14 +2,16 @@ import yaml
 import logging
 
 from flask import Flask
+from flask_limiter import Limiter
 from flask_sqlalchemy import SQLAlchemy
 from flask_redis import FlaskRedis
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 
 db = SQLAlchemy()
 red = FlaskRedis()
 lm = LoginManager()
 lm.login_view = 'page.login'
+limiter = Limiter(key_func=lambda: unicode(current_user.twitch_id))
 
 logger = logging.getLogger('paperwaster.web')
 from paperwaster.web.blueprints import api
@@ -39,5 +41,6 @@ def extensions(app):
     db.init_app(app)
     red.init_app(app)
     lm.init_app(app)
+    limiter.init_app(app)
 
 import paperwaster.models
