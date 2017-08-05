@@ -29,11 +29,7 @@ def load_user(uid):
 
 @page.route('/')
 def index():
-    return render_template('index.html', title='Home')
-
-@page.route('/live')
-def live():
-    return render_template('live.html', title='Live',
+    return render_template('index.html', title='Home',
                            show_stream=request.args.get('stream')!='no')
 
 @page.route('/profile')

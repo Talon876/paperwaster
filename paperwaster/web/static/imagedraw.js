@@ -155,15 +155,17 @@ $(document).ready(function() {
   };
 
   document.getElementById('print').onclick = function(e) {
-    var imageCode = pack();
-    console.log(imageCode);
-    $('#print').addClass('disabled');
-    toastr.info('Printing image...');
-    $('#app').fadeOut(900, function() {
-      clear();
-    }).fadeIn(900, function() {
-      $('#print').removeClass('disabled');
-    });
+    if (bitmap) {
+      var imageCode = pack();
+      console.log(imageCode);
+      $('#print').addClass('disabled');
+      toastr.info('Printing image...');
+      $('#app').fadeOut(900, function() {
+        clear();
+      }).fadeIn(900, function() {
+        $('#print').removeClass('disabled');
+      });
+    }
   };
 
   document.getElementById('shorter').onclick = function(e) {
