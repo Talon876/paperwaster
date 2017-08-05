@@ -64,6 +64,7 @@ def _handle_command(printer, command):
         img = converter.code_to_image(command['code'])
         printer.print_image(img, do_lf=True)
     elif command['cmd'] == 'reset':
+        printer.reset()
         printer.set_defaults()
     elif command['cmd'] == 'linefeed':
         printer.linefeed()

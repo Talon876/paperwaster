@@ -45,22 +45,19 @@ class ThermalPrinter(object):
     # n1 = 0-255 Max printing dots, Unit (8dots), Default: 7 (64 dots)
     # n2 = 3-255 Heating time, Unit (10us), Default: 80 (800us)
     # n3 = 0-255 Heating interval, Unit (10us), Default: 2 (20us)
-    # The more max heating dots, the more peak current will cost
-    # when printing, the faster printing speed. The max heating
-    # dots is 8*(n1+1). The more heating time, the more density,
-    # but the slower printing speed. If heating time is too short,
-    # blank page may occur. The more heating interval, the more
-    # clear, but the slower printing speed.
+    # The more max heating dots, the more peak current will cost when printing, the faster printing speed. The max heating dots is 8*(n1+1).
+    # The more heating time, the more density, but the slower printing speed. If heating time is too short, blank page may occur.
+    # The more heating interval, the more clearer, but the slower printing speed.
 
-    def __init__(self, heat_time=80, heat_interval=2, heating_dots=7, serialport=SERIALPORT):
+    def __init__(self, heat_time=80, heat_interval=2, heat_dots=7, serialport=SERIALPORT):
         self.printer = Serial(serialport, self.BAUDRATE, timeout=self.TIMEOUT)
         self.printer.write(self._ESC) # ESC - command
         self.printer.write(chr(64)) # @   - initialize
-        self.printer.write(self._ESC) # ESC - command
-        self.printer.write(chr(55)) # 7   - print settings
-        self.printer.write(chr(heating_dots))  # Heating dots (20=balance of darkness vs no jams) default = 20
-        self.printer.write(chr(heat_time)) # heat_time Library default = 255 (max)
-        self.printer.write(chr(heat_interval)) # Heat interval (500 uS = slower, but darker) default = 250
+
+        self.heat_dots = heat_dots
+        self.heat_time = heat_time
+        self.heat_interval = heat_interval
+        self.heat_settings(heat_dots, heat_time, heat_interval)
 
         # Description of print density from page 23 of the manual:
         # DC2 # n Set printing density
@@ -74,6 +71,16 @@ class ThermalPrinter(object):
         self.printer.write(chr((printDensity << 4) | printBreakTime))
 
         self.reset()
+
+    def heat_settings(self, heat_dots=None, heat_time=None, heat_interval=None):
+        self.heat_dots = heat_dots or self.heat_dots
+        self.heat_time = heat_time or self.heat_time
+        self.heat_interval = heat_interval or self.heat_interval
+        self.printer.write(self._ESC) # ESC - command
+        self.printer.write(chr(55)) # 7   - print settings
+        self.printer.write(chr(self.heat_dots))  # Heating dots (20=balance of darkness vs no jams) default = 20
+        self.printer.write(chr(self.heat_time)) # heat_time Library default = 255 (max)
+        self.printer.write(chr(self.heat_interval)) # Heat interval (500 uS = slower, but darker) default = 250
 
     def offline(self):
         # Take the printer offline. Print commands sent after this will be
@@ -223,6 +230,9 @@ class ThermalPrinter(object):
 
         return black_and_white_pixels
 
+    def calculate_black_pct(self, pixels):
+        return len([p for p in pixels if p == 0]) / float(len(pixels))
+
     def print_image(self, img, **kw):
         #from PIL import Image
         #i = Image.open("example-lammas.png")
@@ -245,20 +255,25 @@ class ThermalPrinter(object):
                 w, h = i.size
                 p.print_bitmap(data, w, h)
         """
-        counter = 0
-
         black_and_white_pixels = self.convert_pixel_array_to_binary(pixels, w, h)
+        black_pct = self.calculate_black_pct(black_and_white_pixels)
+        counter = 0
         print_bytes = []
+        old_heat_time = self.heat_time
+
+        if black_pct > 0.75:
+            print('More than 75% of pixels are black - decreasing heat time from {} to 60'.format(old_heat_time))
+            self.heat_settings(heat_time=60)
 
         # read the bytes into an array
-        for rowStart in xrange(0, h, 256):
-            chunk_height = 255 if (h - rowStart) > 255 else h - rowStart
+        for row_start in range(0, h, 128):
+            chunk_height = 128 if (h - row_start) > 128 else h - row_start
             print_bytes += (18, 42, chunk_height, 48)
 
-            for i in xrange(0, 48 * chunk_height):
+            for _ in range(0, 48 * chunk_height):
                 # read one byte in
                 byt = 0
-                for xx in xrange(8):
+                for xx in range(8):
                     pixel_value = black_and_white_pixels[counter]
                     counter += 1
                     # check if this is black
@@ -267,11 +282,15 @@ class ThermalPrinter(object):
 
                 print_bytes.append(byt)
 
-        # output the array all at once to the printer
-        # might be better to send while printing when dealing with
-        # very large arrays...
-        for b in print_bytes:
-            self.printer.write(chr(b))
+            print('Printing Image Chunk')
+            for b in print_bytes:
+                self.printer.write(chr(b))
+            print_bytes = []
+            sleep(.1)
+
+        if old_heat_time != self.heat_time:
+            print('Restoring heat time to {}'.format(old_heat_time))
+            self.heat_settings(heat_time=old_heat_time)
 
         if do_lf:
             self.linefeed()
