@@ -32,3 +32,5 @@ def create_app(config_file=None):
 def extensions(app):
     db.init_app(app)
     red.init_app(app)
+
+import paperwaster.models
