@@ -1,8 +1,7 @@
 {% set navigation_bar = [
     ('page.index', 'home', 'Home', False),
-    ('page.live', 'play', 'Live', False),
+    ('page.live', 'play', 'Stream', False),
     ('page.profile', 'user', 'Profile', True),
-    ('page.draw', 'pencil', 'Draw Image', False)
 ] %}
 {% set active_page = active_page | default('page.index') %}
 <!DOCTYPE html>
@@ -15,6 +14,7 @@
         {% endif %}
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href="/static/css/bootstrap.yeti.min.css">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
         <link rel="stylesheet" href="/static/css/style.css">
         <link rel="shortcut icon" href="https://nolat.org/favicon.ico"/>
     </head>

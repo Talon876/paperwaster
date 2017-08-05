@@ -1,5 +1,5 @@
 import datetime as dt
-from flask import Blueprint, request, render_template, redirect, url_for, g, flash
+from flask import Blueprint, request, render_template, redirect, url_for, g, flash, current_app
 from flask_login import login_user, logout_user, current_user, login_required
 
 from paperwaster.web.app import db, red, logger, lm
@@ -17,6 +17,12 @@ def before_request():
         db.session.add(g.user)
         db.session.commit()
 
+@page.context_processor
+def inject_template_vars():
+    return {
+        'debug': current_app.config.get('DEBUG', False)
+    }
+
 @lm.user_loader
 def load_user(uid):
     return User.query.get(int(uid))
@@ -27,16 +33,13 @@ def index():
 
 @page.route('/live')
 def live():
-    return render_template('live.html', title='Live')
+    return render_template('live.html', title='Live',
+                           show_stream=request.args.get('stream')!='no')
 
 @page.route('/profile')
 @login_required
 def profile():
     return render_template('profile.html', title='Your Profile')
-
-@page.route('/draw')
-def draw():
-    return render_template('imagedraw.html', title='Image Drawer')
 
 @page.route('/logout')
 def logout():

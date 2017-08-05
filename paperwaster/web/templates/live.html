@@ -3,7 +3,11 @@
 
 {% block content %}
 
-<div class="row text-center">
+{% if show_stream %}
+<div class="row text-center bottom-buffer">
+    <a class="btn btn-info btn-xs pull-right" href="{{url_for('page.live', stream='no')}}">Hide Stream</a>
+</div>
+<div class="row text-center bottom-buffer">
     <div class="col-lg-8">
         <div class="embed-responsive embed-responsive-16by9">
             <iframe src="https://player.twitch.tv/?channel=talon876" class="embed-responsive-item" allowfullscreen="true" scrolling="no"></iframe>
@@ -15,6 +19,11 @@
         </div>
     </div>
 </div>
+{% else %}
+<div class="row text-center bottom-buffer">
+    <a class="btn btn-info" href="{{url_for('page.live')}}">View Talon876's Live Stream</a>
+</div>
+{% endif %}
 
 {% if not g.user.is_authenticated %}
 
@@ -28,12 +37,27 @@
 
 {% else %}
 
-<div class="row text-center bottom-buffer">
+<div class="row bottom-buffer">
     <div class="col-lg-12">
-        <a class="btn btn-warning" id="clear">Clear</a>
-        <a class="btn btn-default" id="shorter">Shorter</a>
-        <a class="btn btn-default" id="taller">Taller</a>
-        <a class="btn btn-primary" id="print">Print</a>
+        <div class="input-group input-group-lg">
+            <input autofocus autocomplete="off" type="text" class="form-control input-lg" id="messageField" placeholder="Message...">
+            <span class="input-group-btn">
+                <button id="sendMessage" class="btn btn-primary btn-lg" type="submit">Send</button>
+            </span>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="row bottom-buffer text-center">
+    <div class="col-lg-12">
+        <div class="btn-group" role="group">
+            <a class="btn btn-lg btn-warning" id="clear">Clear</a>
+            <a class="btn btn-lg btn-default" id="shorter">Shorter</a>
+            <a class="btn btn-lg btn-default" id="taller">Taller</a>
+            <a class="btn btn-lg btn-primary" id="print">Print</a>
+        </div>
     </div>
 </div>
 
@@ -49,5 +73,6 @@
 
 {% block scripts %}
 <script src="/static/paper-full.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script src="/static/imagedraw.js"></script>
 {% endblock %}

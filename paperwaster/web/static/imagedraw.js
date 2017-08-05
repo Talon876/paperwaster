@@ -1,5 +1,12 @@
 paper.install(window);
 (function(){ Math.clamp = function(val,min,max){return Math.max(min,Math.min(max,val));} })();
+toastr.options = {
+  closeButton: true,
+  showDuration: 300,
+  timeOut: 1500,
+  positionClass: 'toast-top-full-width',
+  preventDuplicates: true,
+};
 
 var pixelSize = 16;
 var bitmap = [];
@@ -117,6 +124,16 @@ var pack = function() {
   return packedChunks.join('-');
 };
 
+var clear = function() {
+  bitmap.forEach(function(row, y) {
+    row.forEach(function(col, x) {
+      var pixel = bitmap[y][x];
+      pixel.rect.fillColor = 'white';
+      pixel.value = 0;
+    });
+  });
+};
+
 $(document).ready(function() {
   var canvas = document.getElementById('app');
   var width = canvas.width;
@@ -131,18 +148,22 @@ $(document).ready(function() {
   createPencil(indicator);
 
   document.getElementById('clear').onclick = function(e) {
-    bitmap.forEach(function(row, y) {
-      row.forEach(function(col, x) {
-        var pixel = bitmap[y][x];
-        pixel.rect.fillColor = 'white';
-        pixel.value = 0;
-      });
-    });
+    toastr.warning('Ka-Boom!', {showDuration: 300, timeout: 500});
+    $('#app').fadeOut(400, function() {
+      clear();
+    }).fadeIn(400);
   };
 
   document.getElementById('print').onclick = function(e) {
     var imageCode = pack();
     console.log(imageCode);
+    $('#print').addClass('disabled');
+    toastr.info('Printing image...');
+    $('#app').fadeOut(900, function() {
+      clear();
+    }).fadeIn(900, function() {
+      $('#print').removeClass('disabled');
+    });
   };
 
   document.getElementById('shorter').onclick = function(e) {
@@ -157,5 +178,20 @@ $(document).ready(function() {
 
   pencil.activate();
   view.draw();
+
+  $('#sendMessage').click(function(e) {
+    var msg = $('#messageField').val();
+    if (msg) {
+      console.log('Printing ' + msg);
+      toastr.info('Print message...');
+      $('#messageField').val('');
+    }
+  });
+  $('#messageField').keypress(function(e) {
+    if (e.which == 13) {
+      $('#sendMessage').click();
+      return false;
+    }
+  });
 });
 
