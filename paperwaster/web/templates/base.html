@@ -1,0 +1,74 @@
+{% set navigation_bar = [
+    ('page.index', 'home', 'Home', False),
+    ('page.live', 'play', 'Live', False),
+    ('page.profile', 'user', 'Profile', True),
+    ('page.draw', 'pencil', 'Draw Image', False)
+] %}
+{% set active_page = active_page | default('page.index') %}
+<!DOCTYPE html>
+<html>
+    <head>
+        {% if title %}
+        <title>{{ title }} - Paper Waster</title>
+        {% else %}
+        <title>Printer Bot</title>
+        {% endif %}
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="/static/css/bootstrap.yeti.min.css">
+        <link rel="stylesheet" href="/static/css/style.css">
+        <link rel="shortcut icon" href="https://nolat.org/favicon.ico"/>
+    </head>
+    <body>
+        <nav class="navbar navbar-default">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nb1">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Paper Waster</a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="nb1">
+                    <ul class="nav navbar-nav">
+                        {% for view, glyph, label, requser in navigation_bar %}
+                        {% if requser and g.user.is_authenticated or not requser %}
+                        <li {% if view == active_page %} class="active" {% endif %}><a href="{{ url_for(view) }}"><span class="glyphicon right-buffer glyphicon-{{glyph}}"></span>{{label}}</a></li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if g.user.is_authenticated %}
+                        <p class="navbar-text">{{ g.user.nickname }}</p>
+                        <li><a href="{{ url_for('page.logout') }}">Logout</a></li>
+                        {% else %}
+                        <li><a class="narrow-vpadding" href="{{ url_for('page.authorize', provider='twitch') }}"><img src="/static/twitch-login.png"/></a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                        {{ message }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+        </div>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+        {% block scripts %}{% endblock %}
+    </body>
+</html>

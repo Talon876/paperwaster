@@ -1,0 +1,25 @@
+.navbar-nav > li > .narrow-vpadding {
+    padding-top: 7px;
+    padding-bottom: 6px
+}
+
+.top-buffer {
+    margin-top: 12px;
+}
+
+.bottom-buffer {
+    margin-bottom: 12px;
+}
+
+.right-buffer {
+    margin-right: 4px;
+}
+
+.left-buffer {
+    margin-left: 4px;
+}
+
+.chat-embed {
+    padding-bottom: 120%;
+}
+

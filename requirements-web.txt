@@ -9,5 +9,6 @@ sqlalchemy-utils
 flask-redis
 flask-login
 flask-debugtoolbar
+rauth
 
 gunicorn>=19.7

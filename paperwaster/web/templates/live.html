@@ -1,17 +1,23 @@
 {% extends "base.html" %}
-{% set active_page = "page.index" %}
+{% set active_page = "page.live" %}
 
 {% block content %}
+
 <div class="row text-center">
-    <div class="col-lg-12">
-        <div class="page-header">
-            <h1>Paper Waster</h1>
-            <p class="lead">Submit messages and images and watch them print live on a thermal printer!</p>
+    <div class="col-lg-8">
+        <div class="embed-responsive embed-responsive-16by9">
+            <iframe src="https://player.twitch.tv/?channel=talon876" class="embed-responsive-item" allowfullscreen="true" scrolling="no"></iframe>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="embed-responsive embed-responsive-4by3 chat-embed">
+            <iframe src="https://www.twitch.tv/talon876/chat?popout=" class="embed-responsive-item" allowfullscreen="true" height="500" scrolling="no"></iframe>
         </div>
     </div>
 </div>
 
 {% if not g.user.is_authenticated %}
+
 <div class="row text-center bottom-buffer">
     <div class="col-lg-12">
         <div>
@@ -19,6 +25,7 @@
         </div>
     </div>
 </div>
+
 {% else %}
 
 <div class="row text-center bottom-buffer">
@@ -35,6 +42,7 @@
         <canvas style="border: 1px solid black" id="app" width="768" height="128"></canvas>
     </div>
 </div>
+
 {% endif %}
 
 {% endblock %}

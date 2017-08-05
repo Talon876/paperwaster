@@ -4,9 +4,12 @@ import logging
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_redis import FlaskRedis
+from flask_login import LoginManager
 
 db = SQLAlchemy()
 red = FlaskRedis()
+lm = LoginManager()
+lm.login_view = 'page.login'
 
 logger = logging.getLogger('paperwaster.web')
 from paperwaster.web.blueprints import api
@@ -25,6 +28,9 @@ def create_app(config_file=None):
     app.register_blueprint(page)
     app.register_blueprint(api)
 
+    app.jinja_env.trim_blocks = True
+    app.jinja_env.lstrip_blocks = True
+
     extensions(app)
 
     return app
@@ -32,5 +38,6 @@ def create_app(config_file=None):
 def extensions(app):
     db.init_app(app)
     red.init_app(app)
+    lm.init_app(app)
 
 import paperwaster.models

@@ -1,13 +1,74 @@
-from flask import Blueprint, request, render_template, redirect, url_for
+import datetime as dt
+from flask import Blueprint, request, render_template, redirect, url_for, g, flash
+from flask_login import login_user, logout_user, current_user, login_required
 
-from paperwaster.web.app import db, red, logger
-from paperwaster import publish_message
+from paperwaster.web.app import db, red, logger, lm
+from paperwaster.web.auth import OAuthSignIn
+from paperwaster.models import User, Message
+from paperwaster import publish, publish_message, parse_message
 
 page = Blueprint('page', __name__)
 
+@page.before_request
+def before_request():
+    g.user = current_user
+    if g.user.is_authenticated:
+        g.user.last_seen = dt.datetime.utcnow()
+        db.session.add(g.user)
+        db.session.commit()
+
+@lm.user_loader
+def load_user(uid):
+    return User.query.get(int(uid))
+
 @page.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', title='Home')
+
+@page.route('/live')
+def live():
+    return render_template('live.html', title='Live')
+
+@page.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html', title='Your Profile')
+
+@page.route('/draw')
+def draw():
+    return render_template('imagedraw.html', title='Image Drawer')
+
+@page.route('/logout')
+def logout():
+    logout_user()
+    flash('You have been logged out')
+    return redirect(url_for('page.index'))
+
+@page.route('/authorize/<provider>')
+def authorize(provider):
+    oauth = OAuthSignIn.get_provider(provider)
+    return oauth.authorize()
+
+@page.route('/callback/<provider>')
+def oauth_callback(provider):
+    oauth = OAuthSignIn.get_provider(provider)
+    social_username = oauth.callback()
+    if not social_username:
+        flash('Login failed', 'danger')
+        return redirect(url_for('page.index'))
+
+    user = User.query.filter_by(twitch_id=social_username).first()
+    if not user:
+        user = User(twitch_id=social_username, nickname=social_username)
+        logger.info('Adding new user {}'.format(user))
+        db.session.add(user)
+        db.session.commit()
+    user.last_login = dt.datetime.utcnow()
+    db.session.add(user)
+    db.session.commit()
+    login_user(user)
+    return redirect(url_for('page.index'))
+
 
 @page.route('/send-message', methods=['POST'])
 def send_message():

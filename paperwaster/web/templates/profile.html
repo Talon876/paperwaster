@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% set active_page = "page.profile" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap;" class="page-header">
+            <h1>{{ g.user.nickname }}</h1>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+

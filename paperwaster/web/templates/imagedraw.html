@@ -1,32 +1,20 @@
 {% extends "base.html" %}
-{% set active_page = "page.index" %}
+{% set active_page = "page.draw" %}
 
 {% block content %}
 <div class="row text-center">
     <div class="col-lg-12">
-        <div class="page-header">
-            <h1>Paper Waster</h1>
-            <p class="lead">Submit messages and images and watch them print live on a thermal printer!</p>
-        </div>
+        <h1>Image Drawer</h1>
+        <p class="lead">Create an image to send to the printer!</p>
     </div>
 </div>
-
-{% if not g.user.is_authenticated %}
-<div class="row text-center bottom-buffer">
-    <div class="col-lg-12">
-        <div>
-        <a class="narrow-vpadding" href="{{ url_for('page.authorize', provider='twitch') }}"><img src="/static/twitch-login.png"/></a> to draw images!
-        </div>
-    </div>
-</div>
-{% else %}
 
 <div class="row text-center bottom-buffer">
     <div class="col-lg-12">
         <a class="btn btn-warning" id="clear">Clear</a>
         <a class="btn btn-default" id="shorter">Shorter</a>
         <a class="btn btn-default" id="taller">Taller</a>
-        <a class="btn btn-primary" id="print">Print</a>
+        <a class="btn btn-primary" id="save">Save</a>
     </div>
 </div>
 
@@ -35,7 +23,6 @@
         <canvas style="border: 1px solid black" id="app" width="768" height="128"></canvas>
     </div>
 </div>
-{% endif %}
 
 {% endblock %}
 
@@ -43,3 +30,4 @@
 <script src="/static/paper-full.min.js"></script>
 <script src="/static/imagedraw.js"></script>
 {% endblock %}
+
