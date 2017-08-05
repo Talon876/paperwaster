@@ -26,6 +26,7 @@ def publish_message(msg, font, size, r=None, redis_uri=None):
 
 def publish(command, r=None, redis_uri=None):
     r = r or redis.StrictRedis.from_url(redis_uri)
+    logger.info('Publishing {}'.format(command))
     r.publish('paperwaster:messages', json.dumps(command))
 
 def subscribe(redis_uri=None, r=None, printer=None):
@@ -74,22 +75,22 @@ def parse_message(msg):
     if cmd.lower() in ['print'] and arg:
         return {'cmd': 'print', 'msg': arg, 'font': 'hack', 'size': 22}
 
-    if cmd.lower() in ['tiny'] and arg:
+    elif cmd.lower() in ['tiny'] and arg:
         return {'cmd': 'print', 'msg': arg, 'font': 'hack-bold', 'size': 12}
 
-    if cmd.lower() in ['small'] and arg:
+    elif cmd.lower() in ['small'] and arg:
         return {'cmd': 'print', 'msg': arg, 'font': 'hack-bold', 'size': 18}
 
-    if cmd.lower() in ['medium'] and arg:
+    elif cmd.lower() in ['medium'] and arg:
         return {'cmd': 'print', 'msg': arg, 'font': 'hack', 'size': 26}
 
-    if cmd.lower() in ['large'] and arg:
+    elif cmd.lower() in ['large'] and arg:
         return {'cmd': 'print', 'msg': arg, 'font': 'hack', 'size': 32}
 
     elif cmd.lower() in ['image', 'img', 'image_code'] and arg:
         return {'cmd': 'image', 'code': arg}
 
-    elif cmd.lower() in ['moar', 'linefeed'] and arg:
+    elif cmd.lower() in ['moar', 'linefeed']:
         return {'cmd': 'linefeed'}
 
     elif cmd.lower() in ['reset']:
