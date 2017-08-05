@@ -6,7 +6,7 @@ import irc.bot
 import irc.strings
 import redis
 
-from paperwaster import logger, publish_message, publish_image_code
+from paperwaster import logger, parse_message, publish
 
 class PrinterBot(irc.bot.SingleServerIRCBot):
     def __init__(self, channel, nickname, server, port=6667, password=None, r=None):
@@ -37,13 +37,8 @@ class PrinterBot(irc.bot.SingleServerIRCBot):
         msg = e.arguments[0]
         nick = e.source.nick
         logger.info('{}: {}'.format(nick, msg.encode('ascii', 'ignore')))
-        cmd = msg.split(' ')[0]
-        arg = msg[len(cmd)+1:]
-        if arg:
-            if cmd.lower() == 'print':
-                publish_message(arg, font='hack', size=28, r=self.r)
-            elif cmd.lower() in ['image', 'img', 'image_code']:
-                publish_image_code(arg, r=self.r)
+        cmd = parse_message(msg)
+        publish(cmd, r=self.r)
 
 def main():
     ap = argparse.ArgumentParser()

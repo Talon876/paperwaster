@@ -12,13 +12,13 @@ from paperwaster.tprinter import ThermalPrinter
 
 def publish_image_code(ic, r=None, redis_uri=None):
     publish({
-        'type': 'image',
+        'cmd': 'image',
         'code': ic,
     }, r=r, redis_uri=redis_uri)
 
 def publish_message(msg, font, size, r=None, redis_uri=None):
     publish({
-        'type': 'print',
+        'cmd': 'print',
         'message': msg,
         'font': font,
         'size': size
@@ -50,18 +50,18 @@ def subscribe(redis_uri=None, r=None, printer=None):
 
 def _handle_command(printer, command):
     logger.info('Handling command {}'.format(command))
-    if command['type'] == 'print':
-        command['message'] = command['message'].encode('ascii', 'ignore')
-        logger.info('Printing message {message} (font: {font} {size})'.format(**command))
-        img = converter.text_to_image(command['message'],
+    if command['cmd'] == 'print':
+        command['msg'] = command['msg'].encode('ascii', 'ignore')
+        logger.info('Printing message {msg} (font: {font} {size})'.format(**command))
+        img = converter.text_to_image(command['msg'],
                                       font_path=converter.fonts[command['font']],
                                       font_size=command['size'])
         printer.print_image(img)
-    elif command['type'] == 'image':
-        logger.info('Printing image code {}'.format(command['image_code']))
-        img = converter.code_to_image(command['image_code'])
+    elif command['cmd'] == 'image':
+        logger.info('Printing image code {}'.format(command['code']))
+        img = converter.code_to_image(command['code'])
         printer.print_image(img)
-    elif command['type'] == 'reset':
+    elif command['cmd'] == 'reset':
         printer.set_defaults()
     else:
         logger.info('Unknown command type {}'.format(command))
