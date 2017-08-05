@@ -11,19 +11,22 @@ from paperwaster import converter
 from paperwaster.tprinter import ThermalPrinter
 
 def publish_image_code(ic, r=None, redis_uri=None):
-    r = r or redis.StrictRedis.from_url(redis_uri)
-    r.publish('paperwaster:messages', json.dumps({'type': 'image_code', 'image_code': ic}))
+    publish({
+        'type': 'image',
+        'code': ic,
+    }, r=r, redis_uri=redis_uri)
 
 def publish_message(msg, font, size, r=None, redis_uri=None):
-    r = r or redis.StrictRedis.from_url(redis_uri)
-    payload = {
-        'type': 'message',
+    publish({
+        'type': 'print',
         'message': msg,
         'font': font,
         'size': size
-    }
-    r.publish('paperwaster:messages', json.dumps(payload))
+    }, r=r, redis_uri=redis_uri)
 
+def publish(command, r=None, redis_uri=None):
+    r = r or redis.StrictRedis.from_url(redis_uri)
+    r.publish('paperwaster:messages', json.dumps(command))
 
 def subscribe(redis_uri=None, r=None, printer=None):
     logger.info('Subscribing')
@@ -47,17 +50,46 @@ def subscribe(redis_uri=None, r=None, printer=None):
 
 def _handle_command(printer, command):
     logger.info('Handling command {}'.format(command))
-    if command['type'] == 'image_code':
-        logger.info('Printing image code {}'.format(command['image_code']))
-        img = converter.code_to_image(command['image_code'])
-        printer.print_image(img)
-    elif command['type'] == 'message':
+    if command['type'] == 'print':
         command['message'] = command['message'].encode('ascii', 'ignore')
         logger.info('Printing message {message} (font: {font} {size})'.format(**command))
         img = converter.text_to_image(command['message'],
                                       font_path=converter.fonts[command['font']],
                                       font_size=command['size'])
         printer.print_image(img)
+    elif command['type'] == 'image':
+        logger.info('Printing image code {}'.format(command['image_code']))
+        img = converter.code_to_image(command['image_code'])
+        printer.print_image(img)
+    elif command['type'] == 'reset':
+        printer.set_defaults()
     else:
         logger.info('Unknown command type {}'.format(command))
+
+def parse_message(msg):
+    cmd = msg.split(' ')[0]
+    arg = msg[len(cmd)+1:]
+    if cmd.lower() in ['print'] and arg:
+        return {'cmd': 'print', 'msg': arg, 'font': 'hack', 'size': 22}
+
+    if cmd.lower() in ['tiny'] and arg:
+        return {'cmd': 'print', 'msg': arg, 'font': 'hack-bold', 'size': 12}
+
+    if cmd.lower() in ['small'] and arg:
+        return {'cmd': 'print', 'msg': arg, 'font': 'hack-bold', 'size': 18}
+
+    if cmd.lower() in ['medium'] and arg:
+        return {'cmd': 'print', 'msg': arg, 'font': 'hack', 'size': 26}
+
+    if cmd.lower() in ['large'] and arg:
+        return {'cmd': 'print', 'msg': arg, 'font': 'hack', 'size': 32}
+
+    elif cmd.lower() in ['image', 'img', 'image_code'] and arg:
+        return {'cmd': 'image', 'code': arg}
+
+    elif cmd.lower() in ['reset']:
+        return {'cmd': 'reset'}
+
+    else:
+        return {'cmd': 'nop', 'msg': msg}
 
