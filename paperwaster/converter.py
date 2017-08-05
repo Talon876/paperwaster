@@ -36,7 +36,7 @@ def text_to_image(msg, font=None, font_path=None, font_size=24, accurate=True):
     return img
 
 def code_to_image(image_code, pixel_size=8, trim=True):
-    image_data = ''.join([str(bin(int(s, 16)))[2:].zfill(32) for s in image_code.split('-')])
+    image_data = code_to_imagedata(image_code)
     num_rows = len(image_data) / (PRINTER_WIDTH / pixel_size)
     img = Image.new('1', (PRINTER_WIDTH, num_rows * pixel_size), color='white')
     draw = ImageDraw.Draw(img)
@@ -47,6 +47,9 @@ def code_to_image(image_code, pixel_size=8, trim=True):
                 x, y = tx*pixel_size, ty*pixel_size
                 draw.rectangle([x, y, x + pixel_size, y + pixel_size], fill='black')
     return trim_whitespace(img) if trim else img
+
+def code_to_imagedata(image_code):
+    return ''.join([str(bin(int(s, 16)))[2:].zfill(32) for s in image_code.split('-')])
 
 def trim_whitespace(img):
     w, h = img.size

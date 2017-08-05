@@ -6,6 +6,7 @@ from paperwaster.web.app import db, red, logger, lm, limiter
 from paperwaster.web.auth import OAuthSignIn
 from paperwaster.models import User, Message
 from paperwaster import publish, publish_message, publish_image_code, parse_message
+from paperwaster.converter import code_to_imagedata
 
 page = Blueprint('page', __name__)
 
@@ -76,8 +77,13 @@ def oauth_callback(provider):
 def send_message():
     data = request.get_json()
     if data and data.get('msg'):
-        logger.info('Sending {} to printer'.format(data['msg'].encode('ascii', 'ignore')))
-        publish_message(data['msg'], font='hack', size=28, r=red)
+        err = validate_message(data['msg'])
+        if err:
+            logger.info('Invalid message: {}'.format(data['msg']))
+            return jsonify({'error': err}), 400
+        else:
+            logger.info('Sending {} to printer'.format(data['msg'].encode('ascii', 'ignore')))
+            publish_message(data['msg'], font='hack', size=28, r=red)
     return jsonify({}), 200
 
 @login_required
@@ -86,6 +92,22 @@ def send_message():
 def send_image():
     data = request.get_json()
     if data and data.get('code'):
-        logger.info('Sending image code {} to printer'.format(data['code'].encode('ascii', 'ignore')))
-        publish_image_code(data['code'], r=red)
+        err = validate_image_code(data['code'])
+        if err:
+            logger.info('Image code invalid: {}'.format(data['code']))
+            return jsonify({'error': err}), 400
+        else:
+            logger.info('Sending image code {} to printer'.format(data['code'].encode('ascii', 'ignore')))
+            publish_image_code(data['code'], r=red)
     return jsonify({}), 200
+
+def validate_image_code(img_code):
+    if len(img_code.replace('-', '')) > 72*8:
+        logger.info('Image is larger than expected')
+        return 'Image too large'
+    return None
+
+def validate_message(msg):
+    if len(msg) > 512:
+        return 'Message too long - please remove {} characters.'.format(len(msg)-512)
+    return None

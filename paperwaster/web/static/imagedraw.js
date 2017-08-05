@@ -188,8 +188,11 @@ $(document).ready(function() {
           } else if (xhr.status == 429) {
             $('#print').removeClass('disabled');
             var seconds = xhr.getResponseHeader('Retry-After');
-            var suffix = (seconds <= 1 ? ' 1 second!' : seconds + ' seconds!')
+            var suffix = (seconds <= 1 ? ' 1 second!' : seconds + ' seconds!');
             toastr.error('Whoa there - try again in ' + suffix);
+          } else {
+            $('#print').removeClass('disabled');
+            toastr.error(xhr.responseJSON.error, 'Oh noez!');
           }
         }
       });
@@ -224,8 +227,11 @@ $(document).ready(function() {
             $('#messageField').val('');
           } else if (xhr.status == 429) {
             var seconds = xhr.getResponseHeader('Retry-After');
-            var suffix = (seconds <= 1 ? ' 1 second!' : seconds + ' seconds!')
+            var suffix = (seconds <= 1 ? ' 1 second!' : seconds + ' seconds!');
             toastr.error('Whoa there - try again in ' + suffix);
+          } else {
+            $('#print').removeClass('disabled');
+            toastr.error(xhr.responseJSON.error, 'Oh noez!');
           }
         }
       });
