@@ -63,6 +63,8 @@ def _handle_command(printer, command):
         printer.print_image(img)
     elif command['cmd'] == 'reset':
         printer.set_defaults()
+    elif command['cmd'] == 'linefeed':
+        printer.linefeed()
     else:
         logger.info('Unknown command type {}'.format(command))
 
@@ -86,6 +88,9 @@ def parse_message(msg):
 
     elif cmd.lower() in ['image', 'img', 'image_code'] and arg:
         return {'cmd': 'image', 'code': arg}
+
+    elif cmd.lower() in ['moar', 'linefeed'] and arg:
+        return {'cmd': 'linefeed'}
 
     elif cmd.lower() in ['reset']:
         return {'cmd': 'reset'}
