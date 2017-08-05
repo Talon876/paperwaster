@@ -3,6 +3,8 @@
 from serial import Serial
 from struct import unpack
 from time import sleep
+import logging
+logger = logging.getLogger('paperwaster.tprinter')
 
 class ThermalPrinter(object):
     """
@@ -262,7 +264,7 @@ class ThermalPrinter(object):
         old_heat_time = self.heat_time
 
         if black_pct > 0.75:
-            print('More than 75% of pixels are black - decreasing heat time from {} to 60'.format(old_heat_time))
+            logger.info('More than 75% of pixels are black - decreasing heat time from {} to 60'.format(old_heat_time))
             self.heat_settings(heat_time=60)
 
         # read the bytes into an array
@@ -282,14 +284,14 @@ class ThermalPrinter(object):
 
                 print_bytes.append(byt)
 
-            print('Printing Image Chunk')
+            logger.info('Printing Image Chunk')
             for b in print_bytes:
                 self.printer.write(chr(b))
             print_bytes = []
             sleep(.1)
 
         if old_heat_time != self.heat_time:
-            print('Restoring heat time to {}'.format(old_heat_time))
+            logger.info('Restoring heat time to {}'.format(old_heat_time))
             self.heat_settings(heat_time=old_heat_time)
 
         if do_lf:
