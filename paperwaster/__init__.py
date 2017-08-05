@@ -11,13 +11,13 @@ from paperwaster import converter
 from paperwaster.tprinter import ThermalPrinter
 
 def publish_image_code(ic, r=None, redis_uri=None):
-    publish({
+    return publish({
         'cmd': 'image',
         'code': ic,
     }, r=r, redis_uri=redis_uri)
 
 def publish_message(msg, font, size, r=None, redis_uri=None):
-    publish({
+    return publish({
         'cmd': 'print',
         'msg': msg,
         'font': font,
@@ -29,6 +29,7 @@ def publish(command, r=None, redis_uri=None):
     r = r or redis.StrictRedis.from_url(redis_uri)
     logger.info('Publishing {}'.format(command))
     r.publish('paperwaster:messages', json.dumps(command))
+    return command
 
 def subscribe(redis_uri=None, r=None, printer=None):
     logger.info('Subscribing')

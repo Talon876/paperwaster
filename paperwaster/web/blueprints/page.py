@@ -1,10 +1,11 @@
+import json
 import datetime as dt
 from flask import Blueprint, request, render_template, redirect, url_for, g, flash, current_app, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 
 from paperwaster.web.app import db, red, logger, lm, limiter
 from paperwaster.web.auth import OAuthSignIn
-from paperwaster.models import User, Message
+from paperwaster.models import User, Message, Command
 from paperwaster import publish, publish_message, publish_image_code, parse_message
 from paperwaster.converter import code_to_imagedata
 
@@ -83,7 +84,8 @@ def send_message():
             return jsonify({'error': err}), 400
         else:
             logger.info('Sending {} to printer'.format(data['msg'].encode('ascii', 'ignore')))
-            publish_message(data['msg'], font='hack', size=28, r=red)
+            cmd = publish_message(data['msg'], font='hack', size=28, r=red)
+            save_command(cmd)
     return jsonify({}), 200
 
 @login_required
@@ -98,7 +100,8 @@ def send_image():
             return jsonify({'error': err}), 400
         else:
             logger.info('Sending image code {} to printer'.format(data['code'].encode('ascii', 'ignore')))
-            publish_image_code(data['code'], r=red)
+            cmd = publish_image_code(data['code'], r=red)
+            save_command(cmd)
     return jsonify({}), 200
 
 def validate_image_code(img_code):
@@ -111,3 +114,13 @@ def validate_message(msg):
     if len(msg) > 512:
         return 'Message too long - please remove {} characters.'.format(len(msg)-512)
     return None
+
+def save_command(cmd):
+    try:
+        cmd_name = cmd['cmd']
+        del cmd['cmd']
+        c = Command(cmd=cmd_name, data=json.dumps(cmd), user=current_user)
+        db.session.add(c)
+        db.session.commit()
+    except:
+        logger.error('Failed to save command: {}'.format(cmd), exc_info=True)

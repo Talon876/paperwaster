@@ -14,6 +14,7 @@ class User(db.Model):
     last_seen = db.Column(db.DateTime)
     dots = db.Column(db.Integer, default=0, nullable=False)
     messages = db.relationship('Message', backref='user', lazy='dynamic')
+    commands = db.relationship('Command', backref='user', lazy='dynamic')
 
     @property
     def is_authenticated(self):
@@ -42,3 +43,11 @@ class Message(db.Model):
 
     def __repr__(self):
         return '<{}>'.format(self.body.encode('ascii', 'ignore'))
+
+class Command(db.Model):
+    __tablename__ = 'command'
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=dt.datetime.utcnow)
+    cmd = db.Column(db.String(64), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    data = db.Column(db.String(2048))
