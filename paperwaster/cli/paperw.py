@@ -8,6 +8,8 @@ class NullPrinter(object):
     def set_defaults(self): pass
     def print_image(self, img):
         img.save('out.bmp')
+    def linefeed(self):
+        pass
 
 def main():
     ap = argparse.ArgumentParser()
