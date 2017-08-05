@@ -25,6 +25,7 @@ def publish_message(msg, font, size, r=None, redis_uri=None):
     }, r=r, redis_uri=redis_uri)
 
 def publish(command, r=None, redis_uri=None):
+    if command['cmd'] == 'nop': return
     r = r or redis.StrictRedis.from_url(redis_uri)
     logger.info('Publishing {}'.format(command))
     r.publish('paperwaster:messages', json.dumps(command))
