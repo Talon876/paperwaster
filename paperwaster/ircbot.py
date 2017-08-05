@@ -38,11 +38,12 @@ class PrinterBot(irc.bot.SingleServerIRCBot):
         nick = e.source.nick
         logger.info('{}: {}'.format(nick, msg.encode('ascii', 'ignore')))
         cmd = msg.split(' ')[0]
-        arg = msg.replace(cmd + ' ', '')
-        if cmd.lower() == 'print':
-            publish_message(arg, font='hack', size=28, r=self.r)
-        elif cmd.lower() in ['image', 'img', 'image_code']:
-            publish_image_code(arg, r=self.r)
+        arg = msg[len(cmd)+1:]
+        if arg:
+            if cmd.lower() == 'print':
+                publish_message(arg, font='hack', size=28, r=self.r)
+            elif cmd.lower() in ['image', 'img', 'image_code']:
+                publish_image_code(arg, r=self.r)
 
 def main():
     ap = argparse.ArgumentParser()
