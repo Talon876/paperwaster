@@ -230,7 +230,7 @@ class ThermalPrinter(object):
         w, h = img.size
         self.print_bitmap(data, w, h)
 
-    def print_bitmap(self, pixels, w, h, do_lf=True):
+    def print_bitmap(self, pixels, w, h, do_lf=False):
         """ Best to use images that have a pixel width of 384 as this corresponds
             to the printer row width.
 
