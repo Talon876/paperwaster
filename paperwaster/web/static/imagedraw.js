@@ -82,7 +82,7 @@ var createPencil = function(indicator) {
     indicator.position = tilePoint.position;
     var pixel = bitmap[tilePoint.tY][tilePoint.tX];
 
-    if (event.event.which === 1) {
+    if (event.event.which === 0 || event.event.which === 1) {
       pixel.rect.fillColor = 'black';
       pixel.value = 1;
     } else if (event.event.which === 3) {
