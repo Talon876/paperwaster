@@ -34,6 +34,15 @@ def index():
     return render_template('index.html', title='Home',
                            show_stream=request.args.get('stream')!='no')
 
+@page.route('/donate')
+def donate():
+    try:
+        n = getattr(current_user, 'twitch_id', 'anonymous')
+        logger.info('Donation click - {} msg: {}'.format(n, request.args.get('msg', '')))
+    except:
+        logger.warn('Could not fetch donator info', exc_info=True)
+    return redirect(current_app.config.get('DONATE_URL', '#'))
+
 @page.route('/profile')
 @login_required
 def profile():

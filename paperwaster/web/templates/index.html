@@ -76,11 +76,20 @@
         <canvas style="border: 1px solid black" id="app" width="768" height="256"></canvas>
     </div>
 </div>
+{% else %}
+<div class="row text-center bottom-buffer">
+    <div class="col-lg-12">
+        <a href="{{ url_for('page.authorize', provider='twitch') }}">
+            <img src="{{url_for('static', filename='editor-placeholder.png')}}"/>
+        </a>
+    </div>
+</div>
+
 {% endif %}
 
 <hr>
 <div class="row text-center text-muted">
-    Please consider a <a class="btn btn-xs btn-success" href="https://www.paypal.me/talon/1">small donation</a><span id='donationReason'></span>
+    Please consider a <a id="donationLink" class="btn btn-xs btn-success" href="{{url_for('page.donate')}}">small donation</a><span class="donation-message" id='donationReason'></span>
 </div>
 
 {% endblock %}

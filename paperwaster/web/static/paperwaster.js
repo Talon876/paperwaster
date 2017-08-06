@@ -265,10 +265,17 @@ $(document).ready(function() {
     }
     $('#donationReason').fadeOut(function() {
       $(this).text(' ' + reason);
+      $('#donationLink').attr('href', function(i, h) {
+          return '/donate?msg=' +  encodeURIComponent(reason);
+      });
     }).fadeIn();
-    setTimeout(updateDonationReason, 120*1000);
   };
-  setTimeout(updateDonationReason, 60*1000);
+  var updateDonationReasonTimer = function() {
+    updateDonationReason();
+    setTimeout(updateDonationReasonTimer, 120*1000);
+  };
+  setTimeout(updateDonationReasonTimer, 60*1000);
+  $('#donationReason').click(updateDonationReason);
 
 
 });
