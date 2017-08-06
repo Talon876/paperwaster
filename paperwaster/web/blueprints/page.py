@@ -83,8 +83,8 @@ def send_message():
             logger.info('Invalid message: {}'.format(data['msg']))
             return jsonify({'error': err}), 400
         else:
-            logger.info('Sending {} to printer'.format(data['msg'].encode('ascii', 'ignore')))
             cmd = publish_message(data['msg'], font='hack', size=28, r=red)
+            logger.info('{} sent {} to printer'.format(current_user.twitch_id, data['msg'].encode('ascii', 'ignore')))
             save_command(cmd)
     return jsonify({}), 200
 
@@ -99,8 +99,8 @@ def send_image():
             logger.info('Image code invalid: {}'.format(data['code']))
             return jsonify({'error': err}), 400
         else:
-            logger.info('Sending image code {} to printer'.format(data['code'].encode('ascii', 'ignore')))
             cmd = publish_image_code(data['code'], r=red)
+            logger.info('{} sent an image code to the printer'.format(current_user.twitch_id, data['code'].encode('ascii', 'ignore')))
             save_command(cmd)
     return jsonify({}), 200
 
