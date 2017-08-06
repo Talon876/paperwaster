@@ -1,0 +1,18 @@
+version: 2
+
+services:
+  webapp:
+    build: .
+    command: gunicorn -b 0.0.0.0:5000 --access-logfile - "paperwaster.web.app:create_app('config.yaml')"
+    volumes:
+      - /nolat/paperwaster/config.yaml:/pw/config.yaml
+      - /nolat/paperwaster/paperwaster.db:/pw/paperwaster.db
+    ports:
+      - 5002:5000
+
+  ircbot:
+    build: .
+    command: paperirc
+    volumes:
+      - /nolat/paperwaster/config.yaml:/pw/config.yaml
+      - /nolat/paperwaster/paperwaster.db:/pw/paperwaster.db
