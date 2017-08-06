@@ -71,17 +71,22 @@
     </div>
 </div>
 
-<div class="row text-center">
+<div class="row text-center bottom-buffer">
     <div class="col-lg-12">
         <canvas style="border: 1px solid black" id="app" width="768" height="128"></canvas>
     </div>
 </div>
 {% endif %}
 
+<hr>
+<div class="row text-center text-muted">
+    Please consider a <a class="btn btn-xs btn-success" href="https://www.paypal.me/talon/1">small donation</a><span id='donationReason'></span>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
 <script src="/static/paper-full.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script src="/static/imagedraw.js"></script>
+<script src="/static/paperwaster.js"></script>
 {% endblock %}
