@@ -23,7 +23,7 @@ def create_app(config_file=None):
     app.config.from_object('paperwaster.web.config.settings')
     app.config.from_pyfile('settings.py', silent=True)
     if config_file:
-        logger.info('Loading config from {}'.format(config_file))
+        logger.debug('Loading config from {}'.format(config_file))
         config = yaml.safe_load(open(config_file))
         app.config.update(config['web'])
 
