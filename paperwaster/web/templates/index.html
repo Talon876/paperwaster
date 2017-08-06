@@ -52,7 +52,7 @@
         <div class="input-group input-group-lg">
             <input autofocus autocomplete="off" type="text" maxlength="512" class="form-control input-lg" id="messageField" placeholder="Print a message...">
             <span class="input-group-btn">
-                <button id="sendMessage" class="btn btn-primary btn-lg" type="submit">Send</button>
+                <button id="sendMessage" class="btn btn-primary btn-lg" type="submit"><span class="glyphicon glyphicon-print right-buffer"></span> Print</button>
             </span>
         </div>
     </div>
@@ -63,17 +63,17 @@
 <div class="row bottom-buffer text-center">
     <div class="col-lg-12">
         <div class="btn-group" role="group">
-            <a class="btn btn-lg btn-warning" id="clear">Clear</a>
+            <a class="btn btn-lg btn-warning" id="clear"><span class="glyphicon glyphicon-trash right-buffer"></span>Clear</a>
             <a class="btn btn-lg btn-default" id="shorter">Shorter</a>
             <a class="btn btn-lg btn-default" id="taller">Taller</a>
-            <a class="btn btn-lg btn-primary" id="print">Print</a>
+            <a class="btn btn-lg btn-primary" id="print"><span class="glyphicon glyphicon-print right-buffer"></span> Print</a>
         </div>
     </div>
 </div>
 
 <div class="row text-center bottom-buffer">
     <div class="col-lg-12">
-        <canvas style="border: 1px solid black" id="app" width="768" height="128"></canvas>
+        <canvas style="border: 1px solid black" id="app" width="768" height="256"></canvas>
     </div>
 </div>
 {% endif %}
