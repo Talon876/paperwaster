@@ -50,9 +50,19 @@
 <div class="row bottom-buffer">
     <div class="col-lg-12">
         <div class="input-group input-group-lg">
-            <input autofocus autocomplete="off" type="text" maxlength="512" class="form-control input-lg" id="messageField" placeholder="Print a message...">
+            <select id="fontSizeField" style="width:15%" class="selectpicker form-control" title="Select Text Size">
+                <option value="medium">Text Size</option>
+                <option style="font-size: 16px" value="tiny">Tiny</option>
+                <option style="font-size: 22px" value="small">Small</option>
+                <option style="font-size: 30px" value="medium">Medium</option>
+                <option style="font-size: 36px" value="large">Large</option>
+            </select>
+            <input style="width:85%" autofocus autocomplete="off" type="text" maxlength="512"
+                   class="form-control input-lg" id="messageField" placeholder="Print a message...">
             <span class="input-group-btn">
-                <button id="sendMessage" class="btn btn-primary btn-lg" type="submit"><span class="glyphicon glyphicon-print right-buffer"></span> Print</button>
+                <button id="sendMessage" class="btn btn-primary btn-lg" type="submit">
+                    <span class="glyphicon glyphicon-print right-buffer"></span> Print
+                </button>
             </span>
         </div>
     </div>
@@ -73,7 +83,7 @@
 
 <div class="row text-center bottom-buffer">
     <div class="col-lg-12">
-        <canvas style="border: 1px solid black" id="app" width="768" height="256"></canvas>
+        <canvas style="border: 1px solid black" id="app" width="768" height="768"></canvas>
     </div>
 </div>
 {% else %}

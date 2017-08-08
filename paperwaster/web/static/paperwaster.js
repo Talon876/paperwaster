@@ -214,12 +214,13 @@ $(document).ready(function() {
 
   $('#sendMessage').click(function(e) {
     var msg = $('#messageField').val();
+    var fontSize = $('#fontSizeField').val();
     if (msg) {
       console.log('Printing ' + msg);
       $.ajax({
         type: 'POST',
         url: '/send-message',
-        data: JSON.stringify({msg:msg}),
+        data: JSON.stringify({msg:msg, size:fontSize}),
         contentType: 'application/json',
         complete: function(xhr, status) {
           if (xhr.status == 200) {

@@ -10,6 +10,7 @@ logger = logging.getLogger('paperwaster')
 from paperwaster import converter
 from paperwaster.tprinter import ThermalPrinter
 
+
 def publish_image_code(ic, r=None, redis_uri=None):
     return publish({
         'cmd': 'image',
@@ -71,6 +72,13 @@ def _handle_command(printer, command):
         printer.linefeed()
     else:
         logger.info('Unknown command type {}'.format(command))
+
+size_map = {
+    'tiny': 12,
+    'small': 18,
+    'medium': 26,
+    'large': 32,
+}
 
 def parse_message(msg):
     cmd = msg.split(' ')[0]

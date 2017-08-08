@@ -6,7 +6,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from paperwaster.web.app import db, red, logger, lm, limiter
 from paperwaster.web.auth import OAuthSignIn
 from paperwaster.models import User, Message, Command
-from paperwaster import publish, publish_message, publish_image_code, parse_message
+from paperwaster import publish, publish_message, publish_image_code, parse_message, size_map
 from paperwaster.converter import code_to_imagedata
 
 page = Blueprint('page', __name__)
@@ -92,7 +92,9 @@ def send_message():
             logger.info('Invalid message: {}'.format(data['msg']))
             return jsonify({'error': err}), 400
         else:
-            cmd = publish_message(data['msg'], font='hack', size=28, r=red)
+            font_size = size_map.get(data.get('size', 'medium'))
+            font_name = 'hack-bold' if font_size <= 18 else 'hack'
+            cmd = publish_message(data['msg'], font=font_name, size=font_size, r=red)
             logger.info('{} sent {} to printer'.format(current_user.twitch_id, data['msg'].encode('ascii', 'ignore')))
             save_command(cmd)
     return jsonify({}), 200
