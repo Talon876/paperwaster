@@ -103,7 +103,7 @@ def send_message():
 
 @login_required
 @page.route('/send-image', methods=['POST'])
-@limiter.limit('1/10seconds')
+@limiter.limit('1/30seconds')
 @limiter.limit('60/1hour')
 def send_image():
     data = request.get_json()
@@ -125,8 +125,8 @@ def validate_image_code(img_code):
     return None
 
 def validate_message(msg):
-    if len(msg) > 512:
-        return 'Message too long - please remove {} characters.'.format(len(msg)-512)
+    if len(msg) > 160:
+        return 'Message too long - please remove {} characters.'.format(len(msg)-160)
     return None
 
 def save_command(cmd):
