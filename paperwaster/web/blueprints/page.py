@@ -74,6 +74,7 @@ def oauth_callback(provider):
         logger.info('Adding new user {}'.format(user))
         db.session.add(user)
         db.session.commit()
+    logger.info('User {} logged on'.format(user))
     user.last_login = dt.datetime.utcnow()
     db.session.add(user)
     db.session.commit()
@@ -84,6 +85,7 @@ def oauth_callback(provider):
 @login_required
 @page.route('/send-message', methods=['POST'])
 @limiter.limit('5/15seconds')
+@limiter.limit('240/1hour')
 def send_message():
     data = request.get_json()
     if data and data.get('msg'):
@@ -102,6 +104,7 @@ def send_message():
 @login_required
 @page.route('/send-image', methods=['POST'])
 @limiter.limit('1/10seconds')
+@limiter.limit('60/1hour')
 def send_image():
     data = request.get_json()
     if data and data.get('code'):
