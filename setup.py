@@ -21,6 +21,7 @@ setup(name='paperwaster',
             'pw-initdb=paperwaster.cli.managedb:init_db',
             'pw-adduser=paperwaster.cli.managedb:add_user',
             'pw-msgimport=paperwaster.cli.managedb:message_import',
+            'pw-imgexport=paperwaster.cli.export_images:main',
         ]
     },
     include_package_data=True,
