@@ -246,7 +246,6 @@ $(document).ready(function() {
   });
 
 
-  /*
   var updateDonationReason = function() {
     var reasons = [
        'to help keep things running!',
@@ -278,7 +277,6 @@ $(document).ready(function() {
   };
   setTimeout(updateDonationReasonTimer, 60*1000);
   $('#donationReason').click(updateDonationReason);
-  */
 
 
 });
