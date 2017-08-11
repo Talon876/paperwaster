@@ -245,41 +245,5 @@ $(document).ready(function() {
     }
   });
 
-
-  /*
-  var updateDonationReason = function() {
-    var reasons = [
-       'to help keep things running!',
-       'to buy me a drink!',
-       'to waste more paper!',
-       'to end the war on paper!',
-       'to become a meme lord!',
-       'to raise your power level to over 9000!',
-       'for no particular reason.',
-       '...please?',
-       'because why not?',
-       "because you're awesome!",
-       'because the voices told you to...',
-    ];
-    var reason = reasons[Math.floor(Math.random()*reasons.length)];
-    while (' ' + reason == $('#donationReason').text()) {
-      reason = reasons[Math.floor(Math.random()*reasons.length)];
-    }
-    $('#donationReason').fadeOut(function() {
-      $(this).text(' ' + reason);
-      $('#donationLink').attr('href', function(i, h) {
-          return '/donate?msg=' +  encodeURIComponent(reason);
-      });
-    }).fadeIn();
-  };
-  var updateDonationReasonTimer = function() {
-    updateDonationReason();
-    setTimeout(updateDonationReasonTimer, 120*1000);
-  };
-  setTimeout(updateDonationReasonTimer, 60*1000);
-  $('#donationReason').click(updateDonationReason);
-  */
-
-
 });
 

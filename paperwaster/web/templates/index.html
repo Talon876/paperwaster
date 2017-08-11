@@ -98,15 +98,23 @@
 {% endif %}
 
 <hr>
-<!--
-<div class="row text-center text-muted">
-    Please consider a <a id="donationLink" class="btn btn-xs btn-success" href="{{url_for('page.donate')}}">small donation</a><span class="donation-message" id='donationReason'></span>
-</div>
--->
 {% raw %}
 <div id="donateApp">
 <div class="row text-center text-muted">
-    <donate-message ref="donateMessage"></donate-message>
+    <donate-message ref="donateMessage" :reasons="[
+        'to help keep things running!',
+        'to buy me a drink!',
+        'to waste more paper!',
+        'to end the war on paper!',
+        'to become a meme lord!',
+        'to raise your power level to over 9000!',
+        'for no particular reason.',
+        '...please?',
+        'because why not?',
+        'because you\'re awesome!',
+        'because the voices told you to...',
+        ]">
+    </donate-message>
 </div>
 </div>
 {% endraw %}
