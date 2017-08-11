@@ -98,14 +98,25 @@
 {% endif %}
 
 <hr>
+<!--
 <div class="row text-center text-muted">
     Please consider a <a id="donationLink" class="btn btn-xs btn-success" href="{{url_for('page.donate')}}">small donation</a><span class="donation-message" id='donationReason'></span>
 </div>
+-->
+{% raw %}
+<div id="donateApp">
+<div class="row text-center text-muted">
+    <donate-message ref="donateMessage"></donate-message>
+</div>
+</div>
+{% endraw %}
 
 {% endblock %}
 
 {% block scripts %}
+<script src="//unpkg.com/vue@2.4.2"></script>
 <script src="/static/paper-full.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script src="/static/paperwaster.js"></script>
+<script src="/static/app.js"></script>
 {% endblock %}
