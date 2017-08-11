@@ -122,7 +122,11 @@
 {% endblock %}
 
 {% block scripts %}
+{% if debug %}
 <script src="//unpkg.com/vue@2.4.2"></script>
+{% else %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/vue/2.4.2/vue.min.js"></script>
+{% endif %}
 <script src="/static/paper-full.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script src="/static/paperwaster.js"></script>
