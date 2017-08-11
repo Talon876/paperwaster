@@ -9,6 +9,8 @@ from paperwaster.models import User, Message, Command
 from paperwaster import publish, publish_message, publish_image_code, parse_message, size_map
 from paperwaster.converter import code_to_imagedata
 
+from sqlalchemy import and_
+
 page = Blueprint('page', __name__)
 
 @page.before_request
@@ -103,7 +105,7 @@ def send_message():
 
 @login_required
 @page.route('/send-image', methods=['POST'])
-@limiter.limit('1/30seconds')
+@limiter.limit('1/20seconds')
 @limiter.limit('60/1hour')
 def send_image():
     data = request.get_json()
@@ -122,6 +124,9 @@ def validate_image_code(img_code):
     if len(img_code.replace('-', '')) > 72*8:
         logger.info('Image is larger than expected')
         return 'Image too large'
+    command_json = json.dumps({'code': img_code})
+    if Command.query.filter(and_(Command.data==command_json, Command.cmd=='image')).first():
+        return 'This image has already been printed, add some unique flair and try again!'
     return None
 
 def validate_message(msg):
