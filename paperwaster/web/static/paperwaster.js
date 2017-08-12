@@ -212,38 +212,5 @@ $(document).ready(function() {
   pencil.activate();
   view.draw();
 
-  $('#sendMessage').click(function(e) {
-    var msg = $('#messageField').val();
-    var fontSize = $('#fontSizeField').val();
-    if (msg) {
-      console.log('Printing ' + msg);
-      $.ajax({
-        type: 'POST',
-        url: '/send-message',
-        data: JSON.stringify({msg:msg, size:fontSize}),
-        contentType: 'application/json',
-        complete: function(xhr, status) {
-          if (xhr.status == 200) {
-            toastr.info('Print message...');
-            $('#messageField').val('');
-          } else if (xhr.status == 429) {
-            var seconds = xhr.getResponseHeader('Retry-After');
-            var suffix = (seconds <= 1 ? ' 1 second!' : seconds + ' seconds!');
-            toastr.error('Whoa there - try again in ' + suffix);
-          } else {
-            $('#print').removeClass('disabled');
-            toastr.error(xhr.responseJSON.error, 'Oh noez!');
-          }
-        }
-      });
-    }
-  });
-  $('#messageField').keypress(function(e) {
-    if (e.which == 13) {
-      $('#sendMessage').click();
-      return false;
-    }
-  });
-
 });
 

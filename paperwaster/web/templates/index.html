@@ -2,6 +2,8 @@
 {% set active_page = "page.index" %}
 
 {% block content %}
+<div id="donateApp">
+
 {% if not g.user.is_authenticated %}
 <div class="row text-center">
     <div class="col-lg-12">
@@ -49,22 +51,11 @@
 {% if g.user.is_authenticated %}
 <div class="row bottom-buffer">
     <div class="col-lg-12">
-        <div class="input-group input-group-lg">
-            <select id="fontSizeField" style="width:15%" class="selectpicker form-control" title="Select Text Size">
-                <option value="medium">Text Size</option>
-                <option style="font-size: 16px" value="tiny">Tiny</option>
-                <option style="font-size: 22px" value="small">Small</option>
-                <option style="font-size: 30px" value="medium">Medium</option>
-                <option style="font-size: 36px" value="large">Large</option>
-            </select>
-            <input style="width:85%" autofocus autocomplete="off" type="text" maxlength="160"
-                   class="form-control input-lg" id="messageField" placeholder="Print a message...">
-            <span class="input-group-btn">
-                <button id="sendMessage" class="btn btn-primary btn-lg" type="submit">
-                    <span class="glyphicon glyphicon-print right-buffer"></span> Print
-                </button>
-            </span>
-        </div>
+        <message-form :font-sizes="[
+            { value: 'tiny', label: 'Tiny', size: 16 },
+            { value: 'small', label: 'Small', size: 22 },
+            { value: 'medium', label: 'Medium', size: 30 },
+            { value: 'large', label: 'Large', size: 36 }]"/>
     </div>
 </div>
 
@@ -98,7 +89,6 @@
 {% endif %}
 
 <hr>
-<div id="donateApp">
 <div class="row text-center text-muted">
     <donate-message donate-url="{{url_for('page.donate')}}" :initial-delay="60*1000" :delay="30*1000" :reasons="[
         'to help keep things running!',
@@ -115,6 +105,7 @@
         ]">
     </donate-message>
 </div>
+
 </div>
 {% endblock %}
 
