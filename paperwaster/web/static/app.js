@@ -25,6 +25,9 @@ Vue.component('donate-message', {
     },
     methods: {
         updateReason: function () {
+            if (this.reason && this.reason.includes('over 9000')) {
+                over9000.play();
+            }
             var reason = this.reasons[Math.floor(Math.random() * this.reasons.length)];
             while (reason === this.reason) {
                 reason = this.reasons[Math.floor(Math.random() * this.reasons.length)];
@@ -95,4 +98,7 @@ Vue.component('message-form', {
 
 new Vue({
     el: '#donateApp',
+});
+var over9000 = new Howl({
+    src: ['/static/9000.ogg']
 });
