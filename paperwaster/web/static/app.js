@@ -56,6 +56,9 @@ Vue.component('donate-message', {
     }
 });
 
+var state = {
+    showStream: window.localStorage['showStream'] === undefined ? true : JSON.parse(window.localStorage['showStream'])
+};
 Vue.component('twitch-stream', {
     template: `
     <div>
@@ -63,12 +66,13 @@ Vue.component('twitch-stream', {
         <div class="col-lg-12">
             <button @click="toggleStream" class="btn btn-xs btn-info btn pull-right">
             <span :class="['glyphicon', icon]"></span>
-            {{this.showStream?'Hide':'Show'}} Stream 
+            {{this.show?'Hide':'Show'}} Stream 
             </button>
         </div>
     </div>
     <transition leave-active-class="animated slideOutRight">
-    <div class="row bottom-buffer" v-if="showStream">
+    <div class="row bottom-buffer" v-if="show">
+        <div>The Stuff</div>
         <div class="col-lg-8">
             <div class="embed-responsive embed-responsive-16by9">
                 <iframe @load="ready('stream')"
@@ -92,25 +96,25 @@ Vue.component('twitch-stream', {
     </div>`,
     props: ['username'],
     data: function() {return {
-        showStream: true,
+        show: window.localStorage['showStream'] === undefined ? true : JSON.parse(window.localStorage['showStream']),
         streamReady: false,
         chatReady: false,
     }},
     computed: {
-        icon: function() {
-            return this.showStream ? 'glyphicon-eye-close':'glyphicon-eye-open';
-        }
+        icon: function () {
+            return this.showStream ? 'glyphicon-eye-close' : 'glyphicon-eye-open';
+        },
     },
     methods: {
         toggleStream: function() {
-            this.showStream = !this.showStream;
+            this.show = !this.show;
+            window.localStorage['showStream'] = JSON.stringify(this.show);
             if (!this.showStream) {
                 this.streamReady = false;
                 this.chatRead = false;
             }
         },
         ready: function(what) {
-            console.log(what + ' is ready');
             if (what === 'stream') {
                 this.streamReady = true;
             } else if (what === 'chat') {
@@ -192,6 +196,7 @@ Vue.component('image-form', {
     <div class="row text-center bottom-buffer">
         <div class="col-lg-12">
             <canvas v-once style="border: 1px solid black"
+                    @contextmenu.prevent
                     ref="drawingArea"
                     :width="width" :height="height"></canvas>
         </div>
