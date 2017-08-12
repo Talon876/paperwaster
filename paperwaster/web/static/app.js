@@ -179,10 +179,10 @@ Vue.component('image-form', {
     <div class="row bottom-buffer text-center">
         <div class="col-lg-12">
             <div class="btn-group" role="group">
-                <button class="btn btn-lg btn-warning" @click="clear(false)">
+                <button class="btn btn-lg btn-warning" @click="clear(true)">
                     <span class="glyphicon glyphicon-trash right-buffer"></span>Clear
                 </button>
-                <button class="btn btn-lg btn-primary" @click="printImage">
+                <button :class="{'disabled': this.sending}" class="btn btn-lg btn-primary" @click="printImage">
                     <span class="glyphicon glyphicon-print right-buffer"></span> Print
                 </button>
             </div>
@@ -203,6 +203,7 @@ Vue.component('image-form', {
         pixelSize: 16,
         width: 768,
         height: 768,
+        sending: false,
     }},
     methods: {
         pack: function() {
@@ -254,6 +255,7 @@ Vue.component('image-form', {
         printImage: function() {
             var self = this;
             if (!this.isImageEmpty()) {
+                this.sending = true;
                 $.ajax({
                     type: 'POST',
                     url: '/send-image',
@@ -270,6 +272,7 @@ Vue.component('image-form', {
                         } else {
                             toastr.error(xhr.responseJSON.error, 'Oh noez!');
                         }
+                        self.sending = false;
                     }
                 });
             }
