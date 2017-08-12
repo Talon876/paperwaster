@@ -208,6 +208,8 @@ Vue.component('image-form', {
         width: 768,
         height: 768,
         sending: false,
+        lastPoint: null,
+        dragging: null
     }},
     methods: {
         pack: function() {
@@ -304,9 +306,46 @@ Vue.component('image-form', {
                     pixel.value = 0;
                 }
             };
-            pencil.onMouseDrag = pencil.onMouseDown;
+            var doLineDrawing = function(x0, y0, x1, y1) {
+                var steep = false;
+                if (Math.abs(x0 - x1) < Math.abs(y0 - y1)) {
+                    [x0, y0] = [y0, x0];
+                    [x1, y1] = [y1, x1];
+                    steep = true;
+                }
+                if (x0 > x1) {
+                    [x0, x1] = [x1, x0];
+                    [y0, y1] = [y1, y0];
+                }
+                var dx = x1 - x0;
+                var dy = y1 - y0;
+
+                var derror2 = Math.abs(dy)*2;
+                var error2 = 0;
+                var y = y0;
+
+                for (var x = x0; x <= x1; x++) {
+                    var pixel = steep?bitmap[x][y]:bitmap[y][x];
+                    pixel.rect.fillColor = 'black';
+                    pixel.value = 1;
+                    error2 += derror2;
+                    if (error2 > dx) {
+                        y += (y1>y0 ? 1 : -1);
+                        error2 -= dx*2;
+                    }
+                }
+            };
+            pencil.onMouseDrag = function (event) {
+                pencil.onMouseDown(event);
+                var tilePoint = self.toTile(event.point);
+                if (this.lastPoint) {
+                    doLineDrawing(this.lastPoint.tX, this.lastPoint.tY, tilePoint.tX, tilePoint.tY);
+                }
+                this.lastPoint = tilePoint;
+            };
             pencil.onMouseUp = function (event) {
                 indicator.bringToFront();
+                this.lastPoint = null;
             };
             pencil.onMouseMove = function (event) {
                 var tilePoint = self.toTile(event.point);
