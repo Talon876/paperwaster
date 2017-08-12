@@ -41,22 +41,8 @@
 
 <hr>
 
-<div class="row bottom-buffer text-center">
-    <div class="col-lg-12">
-        <div class="btn-group" role="group">
-            <a class="btn btn-lg btn-warning" id="clear"><span class="glyphicon glyphicon-trash right-buffer"></span>Clear</a>
-            <a class="btn btn-lg btn-default" id="shorter">Shorter</a>
-            <a class="btn btn-lg btn-default" id="taller">Taller</a>
-            <a class="btn btn-lg btn-primary" id="print"><span class="glyphicon glyphicon-print right-buffer"></span> Print</a>
-        </div>
-    </div>
-</div>
+<image-form></image-form>
 
-<div class="row text-center bottom-buffer">
-    <div class="col-lg-12">
-        <canvas style="border: 1px solid black" id="app" width="768" height="768"></canvas>
-    </div>
-</div>
 {% else %}
 <div class="row text-center bottom-buffer">
     <div class="col-lg-12">
@@ -98,6 +84,5 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/howler/2.0.4/howler.core.min.js"></script>
 <script src="/static/paper-full.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script src="/static/paperwaster.js"></script>
 <script src="/static/app.js"></script>
 {% endblock %}

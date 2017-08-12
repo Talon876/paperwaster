@@ -1,3 +1,14 @@
+paper.install(window);
+Math.clamp = function(val,min,max){return Math.max(min,Math.min(max,val));}
+
+toastr.options = {
+  closeButton: true,
+  showDuration: 300,
+  timeOut: 1500,
+  positionClass: 'toast-top-full-width',
+  preventDuplicates: true,
+};
+
 Vue.component('fading-message', {
     template: `
     <div style="display:inline-block">
@@ -157,6 +168,173 @@ Vue.component('message-form', {
                 });
             }
         }
+    }
+});
+
+var bitmap = [];
+
+Vue.component('image-form', {
+    template: `
+    <div>
+    <div class="row bottom-buffer text-center">
+        <div class="col-lg-12">
+            <div class="btn-group" role="group">
+                <button class="btn btn-lg btn-warning" @click="clear(false)">
+                    <span class="glyphicon glyphicon-trash right-buffer"></span>Clear
+                </button>
+                <button class="btn btn-lg btn-primary" @click="printImage">
+                    <span class="glyphicon glyphicon-print right-buffer"></span> Print
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-center bottom-buffer">
+        <div class="col-lg-12">
+            <canvas v-once style="border: 1px solid black"
+                    ref="drawingArea"
+                    :width="width" :height="height"></canvas>
+        </div>
+    </div>
+    </div>
+    `,
+    data: function() {return {
+        pencil: null,
+        pixelSize: 16,
+        width: 768,
+        height: 768,
+    }},
+    methods: {
+        pack: function() {
+            var self = this;
+            var data = [];
+            bitmap.forEach(function (row, y) {
+                row.forEach(function (col, x) {
+                    var pixel = bitmap[y][x];
+                    data.push(pixel.value);
+                });
+            });
+
+            var imageString = data.join('');
+            var chunks = imageString.match(/.{1,32}/g);
+            var packedChunks = chunks ? chunks.map(function (chunk) {
+                var binaryNum = parseInt(chunk, 2);
+                var decimalNum = binaryNum.toString(16);
+                return decimalNum;
+            }) : [];
+            return packedChunks.join('-');
+
+        },
+        isImageEmpty: function() {
+            var self = this;
+            var isEmpty = true;
+            bitmap.forEach(function (row, y) {
+                row.forEach(function (col, x) {
+                    var pixel = bitmap[y][x];
+                    if (pixel.value !== 0) {
+                        isEmpty = false;
+                    }
+                });
+            });
+            return isEmpty;
+        },
+        clear: function(showToast) {
+            if (showToast) {
+                toastr.warning('Ka-Boom!', { showDuration: 300, timeout: 500 });
+            }
+            var self = this;
+            bitmap.forEach(function (row, y) {
+                row.forEach(function (col, x) {
+                    var pixel = bitmap[y][x];
+                    pixel.rect.fillColor = 'white';
+                    pixel.value = 0;
+                });
+            });
+        },
+        printImage: function() {
+            var self = this;
+            if (!this.isImageEmpty()) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/send-image',
+                    data: JSON.stringify({ code: this.pack() }),
+                    contentType: 'application/json',
+                    complete: function (xhr, status) {
+                        if (xhr.status == 200) {
+                            toastr.info('Printing image...');
+                            self.clear(false);
+                        } else if (xhr.status == 429) {
+                            var seconds = xhr.getResponseHeader('Retry-After');
+                            var suffix = (seconds <= 1 ? ' 1 second!' : seconds + ' seconds!');
+                            toastr.error('Whoa there - try again in ' + suffix);
+                        } else {
+                            toastr.error(xhr.responseJSON.error, 'Oh noez!');
+                        }
+                    }
+                });
+            }
+        },
+        createIndicator: function () {
+            var indicator = new Path.Rectangle([0, 0], [this.pixelSize, this.pixelSize]);
+            indicator.fillColor = new Color(1, 1, 0, 0.5);
+            indicator.strokeColor = 'black';
+            indicator.strokeWidth = 2;
+            return indicator;
+        },
+        createPencil: function (indicator) {
+            var self = this;
+            pencil = new Tool();
+            pencil.onMouseDown = function (event) {
+                var tilePoint = self.toTile(event.point);
+                indicator.position = tilePoint.position;
+                var pixel = bitmap[tilePoint.tY][tilePoint.tX];
+
+                if (event.event.which === 0 || event.event.which === 1) {
+                    pixel.rect.fillColor = 'black';
+                    pixel.value = 1;
+                } else if (event.event.which === 3) {
+                    pixel.rect.fillColor = 'white';
+                    pixel.value = 0;
+                }
+            };
+            pencil.onMouseDrag = pencil.onMouseDown;
+            pencil.onMouseUp = function (event) {
+                indicator.bringToFront();
+            };
+            pencil.onMouseMove = function (event) {
+                var tilePoint = self.toTile(event.point);
+                indicator.position = tilePoint.position;
+            };
+        },
+        toTile: function (point) {
+            var tx = Math.clamp(Math.floor(point.x / this.pixelSize), 0, paper.view.viewSize.width / this.pixelSize - 1);
+            var ty = Math.clamp(Math.floor(point.y / this.pixelSize), 0, paper.view.viewSize.height / this.pixelSize - 1);
+            return {
+                tX: tx,
+                tY: ty,
+                position: [tx * this.pixelSize + this.pixelSize / 2,
+                ty * this.pixelSize + this.pixelSize / 2]
+            }
+        }
+    },
+    mounted: function() {
+        var width = this.width / this.pixelSize;
+        var height = this.height / this.pixelSize;
+        paper.setup(this.$refs.drawingArea);
+        paper.view.viewSize = [this.width, this.height];
+        var indicator = this.createIndicator()
+        this.pencil = this.createPencil(indicator);
+
+        for (var row = 0; row < height; row++) {
+            var line = [];
+            for (var col = 0; col < width; col++) {
+                var rect = new Path.Rectangle([col * this.pixelSize, row * this.pixelSize], [this.pixelSize, this.pixelSize]);
+                line.push({ rect: rect, value: 0 });
+            }
+            bitmap.push(line);
+        }
+        pencil.activate();
+        paper.view.draw();
     }
 });
 
