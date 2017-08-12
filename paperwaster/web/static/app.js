@@ -72,7 +72,6 @@ Vue.component('twitch-stream', {
     </div>
     <transition leave-active-class="animated slideOutRight">
     <div class="row bottom-buffer" v-if="show">
-        <div>The Stuff</div>
         <div class="col-lg-8">
             <div class="embed-responsive embed-responsive-16by9">
                 <iframe @load="ready('stream')"
@@ -183,12 +182,12 @@ Vue.component('image-form', {
     <div class="row bottom-buffer text-center">
         <div class="col-lg-12">
             <div class="btn-group" role="group">
-                <button class="btn btn-lg btn-warning" @click="clear(true)">
+                <a class="btn btn-lg btn-warning" @click.prevent="clear(true)">
                     <span class="glyphicon glyphicon-trash right-buffer"></span>Clear
-                </button>
-                <button :class="{'disabled': this.sending}" class="btn btn-lg btn-primary" @click="printImage">
+                </a>
+                <a :class="{'disabled': this.sending}" class="btn btn-lg btn-primary" @click.prevent="printImage">
                     <span class="glyphicon glyphicon-print right-buffer"></span> Print
-                </button>
+                </a>
             </div>
         </div>
     </div>
