@@ -11,7 +11,7 @@ Vue.component('fading-message', {
 Vue.component('donate-message', {
     template: `<div>
                  Please consider a <a :href="link" class="btn btn-xs btn-success">small donation </a>
-                 <fading-message class="donation-message" @click.native="updateReason" :message="reason"/>
+                 <fading-message class="donation-message" @click.native="updateReason(true)" :message="reason"/>
                </div>`,
     props: ['reasons', 'delay', 'initialDelay', 'donateUrl'],
     data: function() {return {
@@ -24,8 +24,8 @@ Vue.component('donate-message', {
         }
     },
     methods: {
-        updateReason: function () {
-            if (this.reason && this.reason.includes('over 9000')) {
+        updateReason: function (fun) {
+            if (fun && this.reason && this.reason.includes('over 9000')) {
                 over9000.play();
             }
             var reason = this.reasons[Math.floor(Math.random() * this.reasons.length)];
@@ -42,6 +42,70 @@ Vue.component('donate-message', {
             setTimeout(updateReasonLoop, self.delay);
         };
         setTimeout(updateReasonLoop, this.initialDelay);
+    }
+});
+
+Vue.component('twitch-stream', {
+    template: `
+    <div>
+    <div class="row text-center bottom-buffer">
+        <div class="col-lg-12">
+            <button @click="toggleStream" class="btn btn-xs btn-info btn pull-right">
+            <span :class="['glyphicon', icon]"></span>
+            {{this.showStream?'Hide':'Show'}} Stream 
+            </button>
+        </div>
+    </div>
+    <transition leave-active-class="animated slideOutRight">
+    <div class="row bottom-buffer" v-if="showStream">
+        <div class="col-lg-8">
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe @load="ready('stream')"
+                        :style="{opacity: this.streamReady?1:0}"
+                        :src="'https://player.twitch.tv/?channel=' + this.username"
+                        class="embed-responsive-item slow-fade" allowfullscreen="true" scrolling="no"></iframe>
+                <div style="{opacity: this.streamReady?0:1, border: '1px solid black', width: '300px', height: '200px'">
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="embed-responsive embed-responsive-4by3 chat-embed">
+                <iframe @load="ready('chat')"
+                        :style="{opacity: this.chatReady?1:0}"
+                        :src="'https://www.twitch.tv/' + this.username + '/chat?popout='"
+                        class="embed-responsive-item slow-fade" allowfullscreen="true" scrolling="no"></iframe>
+            </div>
+        </div>
+    </div>
+    </transition>
+    </div>`,
+    props: ['username'],
+    data: function() {return {
+        showStream: true,
+        streamReady: false,
+        chatReady: false,
+    }},
+    computed: {
+        icon: function() {
+            return this.showStream ? 'glyphicon-eye-close':'glyphicon-eye-open';
+        }
+    },
+    methods: {
+        toggleStream: function() {
+            this.showStream = !this.showStream;
+            if (!this.showStream) {
+                this.streamReady = false;
+                this.chatRead = false;
+            }
+        },
+        ready: function(what) {
+            console.log(what + ' is ready');
+            if (what === 'stream') {
+                this.streamReady = true;
+            } else if (what === 'chat') {
+                this.chatReady = true;
+            }
+        },
     }
 });
 
@@ -100,5 +164,6 @@ new Vue({
     el: '#donateApp',
 });
 var over9000 = new Howl({
-    src: ['/static/9000.ogg']
+    src: ['/static/9000.ogg'],
+    volume: 0.35
 });

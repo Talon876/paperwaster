@@ -44,3 +44,10 @@ canvas {
     display: none;
 }
 
+.slow-fade {
+    transition: opacity 2.2s;
+}
+
+.embed-responsive {
+    border: 1px solid black;
+}
