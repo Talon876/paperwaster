@@ -306,7 +306,7 @@ Vue.component('image-form', {
                     pixel.value = 0;
                 }
             };
-            var doLineDrawing = function(x0, y0, x1, y1) {
+            var doLineDrawing = function(x0, y0, x1, y1, event) {
                 var steep = false;
                 if (Math.abs(x0 - x1) < Math.abs(y0 - y1)) {
                     [x0, y0] = [y0, x0];
@@ -326,8 +326,13 @@ Vue.component('image-form', {
 
                 for (var x = x0; x <= x1; x++) {
                     var pixel = steep?bitmap[x][y]:bitmap[y][x];
-                    pixel.rect.fillColor = 'black';
-                    pixel.value = 1;
+                    if (event.event.which === 0 || event.event.which === 1) {
+                        pixel.rect.fillColor = 'black';
+                        pixel.value = 1;
+                    } else if (event.event.which === 3) {
+                        pixel.rect.fillColor = 'white';
+                        pixel.value = 0;
+                    }
                     error2 += derror2;
                     if (error2 > dx) {
                         y += (y1>y0 ? 1 : -1);
@@ -339,7 +344,7 @@ Vue.component('image-form', {
                 pencil.onMouseDown(event);
                 var tilePoint = self.toTile(event.point);
                 if (this.lastPoint) {
-                    doLineDrawing(this.lastPoint.tX, this.lastPoint.tY, tilePoint.tX, tilePoint.tY);
+                    doLineDrawing(this.lastPoint.tX, this.lastPoint.tY, tilePoint.tX, tilePoint.tY, event);
                 }
                 this.lastPoint = tilePoint;
             };
