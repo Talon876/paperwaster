@@ -151,24 +151,22 @@ Vue.component('message-form', {
                 var fontSize = this.fontSize || 'medium';
                 var self = this;
                 console.log('Printing size ' + fontSize + ': ' + this.message);
-                $.ajax({
-                    type: 'POST',
-                    url: '/send-message',
-                    data: JSON.stringify({ msg: this.message, size: fontSize }),
-                    contentType: 'application/json',
-                    complete: function (xhr, status) {
-                        if (xhr.status == 200) {
+                axios.post('/send-message', {msg: this.message, size: fontSize})
+                    .then(function(resp) {
+                        if (resp.status == 200) {
                             toastr.info('Printing message...');
                             self.message = null;
-                        } else if (xhr.status == 429) {
-                            var seconds = xhr.getResponseHeader('Retry-After');
+                        } else if (resp.status == 429) {
+                            var seconds = response.headers['retry-after'];
                             var suffix = (seconds <= 1 ? ' 1 second!' : seconds + ' seconds!');
                             toastr.error('Whoa there - try again in ' + suffix);
                         } else {
-                            toastr.error(xhr.responseJSON.error, 'Oh noez!');
+                            toastr.error(resp.data.error, 'Oh noez!');
                         }
-                    }
-                });
+                    })
+                    .catch(function(err) {
+                        toastr.error(err, 'Oh noez!');
+                    });
             }
         }
     }
@@ -262,25 +260,23 @@ Vue.component('image-form', {
             var self = this;
             if (!this.isImageEmpty()) {
                 this.sending = true;
-                $.ajax({
-                    type: 'POST',
-                    url: '/send-image',
-                    data: JSON.stringify({ code: this.pack() }),
-                    contentType: 'application/json',
-                    complete: function (xhr, status) {
-                        if (xhr.status == 200) {
+                axios.post('/send-image', {code: this.pack()})
+                    .then(function(resp) {
+                        if (resp.status == 200) {
                             toastr.info('Printing image...');
                             self.clear(false);
-                        } else if (xhr.status == 429) {
-                            var seconds = xhr.getResponseHeader('Retry-After');
+                        } else if (resp.status == 429) {
+                            var seconds = resp.headers['retry-after'];
                             var suffix = (seconds <= 1 ? ' 1 second!' : seconds + ' seconds!');
                             toastr.error('Whoa there - try again in ' + suffix);
                         } else {
-                            toastr.error(xhr.responseJSON.error, 'Oh noez!');
+                            toastr.error(resp.data.error, 'Oh noez!');
                         }
                         self.sending = false;
-                    }
-                });
+                    })
+                    .catch(function(err) {
+                        self.sending = false;
+                    });
             }
         },
         createIndicator: function () {
