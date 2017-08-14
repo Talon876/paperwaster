@@ -122,7 +122,10 @@ def send_image():
 
 def validate_image_code(img_code):
     if len(img_code.replace('-', '')) > 72*8:
-        logger.info('Image is larger than expected')
+        logger.info('{} sent image code larger than expected'.format(g.user))
+        return 'Image too large'
+    if len(code_to_imagedata(img_code)) > 48*48:
+        logger.info('{} sent image data larger than expected'.format(g.user))
         return 'Image too large'
     command_json = json.dumps({'code': img_code})
     if Command.query.filter(and_(Command.data==command_json, Command.cmd=='image')).first():
