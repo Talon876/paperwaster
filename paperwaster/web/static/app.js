@@ -156,16 +156,16 @@ Vue.component('message-form', {
                         if (resp.status == 200) {
                             toastr.info('Printing message...');
                             self.message = null;
-                        } else if (resp.status == 429) {
-                            var seconds = response.headers['retry-after'];
+                        }                    })
+                    .catch(function(err) {
+                        if (err.response.status == 429) {
+                            var seconds = err.response.headers['retry-after'];
                             var suffix = (seconds <= 1 ? ' 1 second!' : seconds + ' seconds!');
                             toastr.error('Whoa there - try again in ' + suffix);
                         } else {
-                            toastr.error(resp.data.error, 'Oh noez!');
+                            toastr.error(err.response.data.error, 'Oh noez!');
                         }
-                    })
-                    .catch(function(err) {
-                        toastr.error(err, 'Oh noez!');
+                        self.sending = false;
                     });
             }
         }
@@ -265,16 +265,17 @@ Vue.component('image-form', {
                         if (resp.status == 200) {
                             toastr.info('Printing image...');
                             self.clear(false);
-                        } else if (resp.status == 429) {
-                            var seconds = resp.headers['retry-after'];
-                            var suffix = (seconds <= 1 ? ' 1 second!' : seconds + ' seconds!');
-                            toastr.error('Whoa there - try again in ' + suffix);
-                        } else {
-                            toastr.error(resp.data.error, 'Oh noez!');
                         }
                         self.sending = false;
                     })
                     .catch(function(err) {
+                        if (err.response.status == 429) {
+                            var seconds = err.response.headers['retry-after'];
+                            var suffix = (seconds <= 1 ? ' 1 second!' : seconds + ' seconds!');
+                            toastr.error('Whoa there - try again in ' + suffix);
+                        } else {
+                            toastr.error(err.response.data.error, 'Oh noez!');
+                        }
                         self.sending = false;
                     });
             }
