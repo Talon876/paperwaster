@@ -87,6 +87,7 @@ def oauth_callback(provider):
 @login_required
 @page.route('/send-message', methods=['POST'])
 @limiter.limit('5/15seconds')
+@limiter.limit('25/5minutes')
 @limiter.limit('240/1hour')
 def send_message():
     data = request.get_json()
