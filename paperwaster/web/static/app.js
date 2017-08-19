@@ -183,6 +183,12 @@ Vue.component('image-form', {
                 <a class="btn btn-lg btn-warning" @click.prevent="clear(true)">
                     <span class="glyphicon glyphicon-trash right-buffer"></span>Clear
                 </a>
+                <a class="btn btn-lg btn-info" @click.prevent="setTool('eraser')">
+                    <span class="glyphicon glyphicon-erase right-buffer"></span>Eraser
+                </a>
+                <a class="btn btn-lg btn-info" @click.prevent="setTool('pencil')">
+                    <span class="glyphicon glyphicon-pencil right-buffer"></span>Pencil
+                </a>
                 <a :class="{'disabled': this.sending}" class="btn btn-lg btn-primary" @click.prevent="printImage">
                     <span class="glyphicon glyphicon-print right-buffer"></span> Print
                 </a>
@@ -287,17 +293,17 @@ Vue.component('image-form', {
             indicator.strokeWidth = 2;
             return indicator;
         },
-        createPencil: function (indicator) {
+        createDrawingTool: function (indicator, color, fillValue) {
             var self = this;
-            pencil = new Tool();
+            var pencil = new Tool();
             pencil.onMouseDown = function (event) {
                 var tilePoint = self.toTile(event.point);
                 indicator.position = tilePoint.position;
                 var pixel = bitmap[tilePoint.tY][tilePoint.tX];
 
                 if (event.event.which === 0 || event.event.which === 1) {
-                    pixel.rect.fillColor = 'black';
-                    pixel.value = 1;
+                    pixel.rect.fillColor = color;
+                    pixel.value = fillValue;
                 } else if (event.event.which === 3) {
                     pixel.rect.fillColor = 'white';
                     pixel.value = 0;
@@ -324,8 +330,8 @@ Vue.component('image-form', {
                 for (var x = x0; x <= x1; x++) {
                     var pixel = steep?bitmap[x][y]:bitmap[y][x];
                     if (event.event.which === 0 || event.event.which === 1) {
-                        pixel.rect.fillColor = 'black';
-                        pixel.value = 1;
+                        pixel.rect.fillColor = color;
+                        pixel.value = fillValue;
                     } else if (event.event.which === 3) {
                         pixel.rect.fillColor = 'white';
                         pixel.value = 0;
@@ -353,6 +359,22 @@ Vue.component('image-form', {
                 var tilePoint = self.toTile(event.point);
                 indicator.position = tilePoint.position;
             };
+            return pencil;
+        },
+        createEraser: function (indicator) {
+            return this.createDrawingTool(indicator, 'white', 0);
+        },
+        createPencil: function (indicator) {
+            return this.createDrawingTool(indicator, 'black', 1);
+        },
+        setTool: function(tool) {
+            if (tool === 'pencil') {
+                this.tool = this.pencil;
+                this.tool.activate();
+            } else {
+                this.tool = this.eraser;
+                this.tool.activate();
+            }
         },
         toTile: function (point) {
             var tx = Math.clamp(Math.floor(point.x / this.pixelSize), 0, paper.view.viewSize.width / this.pixelSize - 1);
@@ -372,6 +394,8 @@ Vue.component('image-form', {
         paper.view.viewSize = [this.width, this.height];
         var indicator = this.createIndicator()
         this.pencil = this.createPencil(indicator);
+        this.eraser = this.createEraser(indicator);
+        this.tool = this.pencil;
 
         for (var row = 0; row < height; row++) {
             var line = [];
@@ -381,7 +405,7 @@ Vue.component('image-form', {
             }
             bitmap.push(line);
         }
-        pencil.activate();
+        this.tool.activate();
         paper.view.draw();
     }
 });
