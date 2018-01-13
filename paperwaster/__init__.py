@@ -1,3 +1,4 @@
+import time
 import redis
 import json
 import logging
@@ -41,7 +42,9 @@ def subscribe(redis_uri=None, r=None, printer=None):
     printer.set_defaults()
     while True:
         payload = p.get_message()
-        if not payload: continue
+        if not payload:
+            time.sleep(0.1)
+            continue
         if payload['type'] == 'subscribe':
             logger.info('Subscribed to {}'.format(payload['channel']))
         else:
